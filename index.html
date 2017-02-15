@@ -61,6 +61,71 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-javascript实现放大镜" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/02/15/javascript实现放大镜/" class="article-date">
+  <time datetime="2017-02-15T08:25:15.000Z" itemprop="datePublished">2017-02-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/02/15/javascript实现放大镜/">javascript实现放大镜</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="html脚本"><a href="#html脚本" class="headerlink" title="html脚本"></a>html脚本</h5><p>&lt;!DOCTYPE html&gt;</p>
+<html><br><head><br>    <meta charset="utf-8"><br>    <title>放大镜</title><br></head><br><body><br>    <div id="small-box"><br>    <div id="float-box"></div><br>    <img src="smallpicture.jpg"><br>    </div><br>    <div id="big-box"><br>    <img src="bigpicture.jpg"><br>    </div><br></body><br></html>
+
+<h5 id="css脚本"><a href="#css脚本" class="headerlink" title="css脚本"></a>css脚本</h5><p>*{<br>    margin:0px;<br>    padding:0px;<br>}</p>
+<p>#small-box{<br>    position:relatve;<br>    border:1px solid #ccc;<br>    display:block;<br>    width:400px;<br>    height:255px;<br>    margin:50px;<br>}</p>
+<p>#float-box{<br>    display:none;<br>    width:160px;<br>    height:120px;<br>    position:absolute;<br>    background:#ffffcc;<br>    border:1px solid #ccc;<br>    filter:alpha(opacity=50);<br>    opacity:0.5;<br>}</p>
+<p>#big-box{<br>    display:none;<br>    position:a ;<br>    top:0px;<br>    z-index:1;<br>    left:460px;<br>    width:410px;<br>    height:307px;<br>    overflow:hidden;  //定义溢出元素内容区的内容会如何处理，hidden：内容被修剪，并且其余内容不可见<br>    border:1px solid #ccc;<br>}</p>
+<p>#big-box img{<br>    position:absolute;<br>}</p>
+<h6 id="js脚本"><a href="#js脚本" class="headerlink" title="js脚本"></a>js脚本</h6><p>window.onload = function(){</p>
+<p>//获取所需要操作的对象<br>var smallBox = document.getElementById(“small-box”);<br>var floatBox = document.getElementById(“float-box”);<br>var bigBox = document.getElementById(“big-box”);<br>var bigImage = bigBox.getElmentsByTagName(“img”)[0];</p>
+<p>//鼠标移动到对象上显示放大镜和放大镜放大后的图像<br>smallBox.onmouseover = function(){<br>    floatBox.style.display = “block”;<br>    bigBox.style.display = “block”;<br>}</p>
+<p>//鼠标移出对象时隐藏放大镜和放大镜放大后的图像<br>smallBox.onmouseout = function(){<br>    floatBox.style.display = “none”;<br>    bigBox.style.display = “none”;<br>}</p>
+<p>//鼠标在对象上移动触法的事件<br>smallBox.onmousemove = function(e){<br>    var event = e || window.event;<br>    var left = event.clientX - smallBox.offsetLeft - floatBox.offsetWidth/2;<br>    var top = event.clientY - smallBox.offsetTop - floatBox.offsetHeight/2;</p>
+<pre><code>if(left&lt;0){
+    left = 0;
+}else if (left &gt; (smallBox.offsetWidth - floatBox.offsetWidth)){
+left = smallBox.offsetWidth - floatBox.offsetWidth;
+}
+
+if(top&lt;0){
+    top = 0;
+}else if (top &gt; (smallBox.offsetHeight - floatBox.offsetHeight)){
+top = smallBox.offsetHeight - floatBox.offsetHeight;
+}
+
+bigImage.style.left = -left/smallBox.offsetWidth*bigImage.offsetWidth +&quot;px&quot;;
+bigImage.style.top = -top/smallBox.offsetHeight*bigImage.offsetHeight+&quot;px&quot;;
+</code></pre><p>}</p>
+<p>}</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/15/javascript实现放大镜/" data-id="ciz6qd73l0002hc4029nxhvgs" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-第二篇" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/02/09/第二篇/" class="article-date">
@@ -89,13 +154,13 @@
 <h5 id="创建Repository"><a href="#创建Repository" class="headerlink" title="创建Repository"></a>创建Repository</h5><p>注意名字是Yourname.github.io<br>1.修改配置文件_config.yml里的deploy，<br>   “type: git<br>    repo: <a href="https://github.com/becky76/becky76.github.io">https://github.com/becky76/becky76.github.io</a><br>    branch: master”</p>
 <h5 id="设置SSH-keys"><a href="#设置SSH-keys" class="headerlink" title="设置SSH keys"></a>设置SSH keys</h5><p>配置SSH的官方教程是：<a href="https://help.github.com/articles/generating-ssh-keys/" target="_blank" rel="external">https://help.github.com/articles/generating-ssh-keys/</a><br>1.先检查是否存在了SSH keys “ls -al ~/.ssh<br>2.存在的话直接删除.ssh文件夹里面所有文件，.ssh文件夹在密钥文件在C:\Users\n.ssh<br>3.输入以下指令生成新的ssh key“ssh-keygen -t rsa -C “xxx@163.com””（邮箱是注册Github时用的邮箱），提示输入passphrase时可以直接回车不输入。<br>4.启动ssh-agent “ssh-agent -s”<br>5.添加新ssh key到ssh-agent “ssh-add ~/.ssh/id_rsa”<br>6.成功后拷贝id_rsa.pub到settings-&gt;SSH keys添加ssh key<br>7.是否成功添加SSH key可通过“ssh -T git@github.com”查询</p>
 <h5 id="完成部署"><a href="#完成部署" class="headerlink" title="完成部署"></a>完成部署</h5><p>1.“hexo generate”和“hexo deploy”，浏览器打开“<a href="http://becky76.github.io/”" target="_blank" rel="external">http://becky76.github.io/”</a></p>
-<h5 id="写文章"><a href="#写文章" class="headerlink" title="写文章"></a>写文章</h5><p>1.new “title”<br>2.编辑source_posts\article.md<br>注意每次修改本地文件后，需要在C：\Hexo目录下键入“hexo generate”才能保存</p>
+<h5 id="写文章"><a href="#写文章" class="headerlink" title="写文章"></a>写文章</h5><p>1.hexo new “title”<br>2.编辑source_posts\article.md<br>注意每次修改本地文件后，需要在C：\Hexo目录下键入“hexo generate”才能保存</p>
 <p>嗯..界面确实很丑，有时间再改吧</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/09/第二篇/" data-id="ciyyi7b9q0002rg40yi0y4zwb" class="article-share-link">Share</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/09/第二篇/" data-id="ciz6qd73s0003hc40r0bx27w4" class="article-share-link">Share</a>
       
       
     </footer>
@@ -149,7 +214,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/My-first/" data-id="ciyyi7b8s0000rg40qd1e5ohj" class="article-share-link">Share</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/My-first/" data-id="ciz6qd72t0000hc4080a26i9x" class="article-share-link">Share</a>
       
       
     </footer>
@@ -194,7 +259,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/hello-world/" data-id="ciyyi7b9c0001rg40b03csobp" class="article-share-link">Share</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/hello-world/" data-id="ciz6qd73b0001hc40cey4uj8v" class="article-share-link">Share</a>
       
       
     </footer>
@@ -232,6 +297,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/02/15/javascript实现放大镜/">javascript实现放大镜</a>
+          </li>
         
           <li>
             <a href="/2017/02/09/第二篇/">第二篇</a>
