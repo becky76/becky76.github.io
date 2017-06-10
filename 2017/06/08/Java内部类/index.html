@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java内部类 | Becky</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="不允许同一个包中的其他类访问该类。
+内部类成员可直接访问外部类的私有数据，反之不成立。
+匿名内部类适合用于创建哪些仅需要一次使用的类。
+成员内部类是一种和Field、方法、构造器相似的类内部。局部内部类和匿名内部类则不是类成员。
+成员内部类分为两种：静态内部类和非静态内部类。
+编译生成两个class文件，一个是外部类的class文件，一个是成员内部类的class文件OuterClass$Inne">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java内部类">
+<meta property="og:url" content="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/08/Java内部类/index.html">
+<meta property="og:site_name" content="Becky">
+<meta property="og:description" content="不允许同一个包中的其他类访问该类。
+内部类成员可直接访问外部类的私有数据，反之不成立。
+匿名内部类适合用于创建哪些仅需要一次使用的类。
+成员内部类是一种和Field、方法、构造器相似的类内部。局部内部类和匿名内部类则不是类成员。
+成员内部类分为两种：静态内部类和非静态内部类。
+编译生成两个class文件，一个是外部类的class文件，一个是成员内部类的class文件OuterClass$Inne">
+<meta property="og:updated_time" content="2017-06-08T03:43:35.499Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java内部类">
+<meta name="twitter:description" content="不允许同一个包中的其他类访问该类。
+内部类成员可直接访问外部类的私有数据，反之不成立。
+匿名内部类适合用于创建哪些仅需要一次使用的类。
+成员内部类是一种和Field、方法、构造器相似的类内部。局部内部类和匿名内部类则不是类成员。
+成员内部类分为两种：静态内部类和非静态内部类。
+编译生成两个class文件，一个是外部类的class文件，一个是成员内部类的class文件OuterClass$Inne">
+  
+    <link rel="alternate" href="/atom.xml" title="Becky" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Becky</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/becky76/becky76.github.io/blob/master/index.html"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Java内部类" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/08/Java内部类/" class="article-date">
+  <time datetime="2017-06-08T02:57:19.000Z" itemprop="datePublished">2017-06-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java内部类
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ol>
+<li>不允许同一个包中的其他类访问该类。</li>
+<li>内部类成员可直接访问外部类的私有数据，反之不成立。</li>
+<li>匿名内部类适合用于创建哪些仅需要一次使用的类。</li>
+<li>成员内部类是一种和Field、方法、构造器相似的类内部。局部内部类和匿名内部类则不是类成员。</li>
+<li>成员内部类分为两种：静态内部类和非静态内部类。</li>
+<li>编译生成两个class文件，一个是外部类的class文件，一个是成员内部类的class文件OuterClass$InnerClass.class。</li>
+</ol>
+<h2 id="非静态内部类"><a href="#非静态内部类" class="headerlink" title="非静态内部类"></a>非静态内部类</h2><h4 id="非静态内部类和外部类成员的关系"><a href="#非静态内部类和外部类成员的关系" class="headerlink" title="非静态内部类和外部类成员的关系"></a>非静态内部类和外部类成员的关系</h4><p>非静态内部类里可以直接访问外部类的private成员，这是因为在非静态内部类对象里，保存了一个它寄存的外部类对象的引用（当调用非静态内部类的实例方法时，必须有一个非静态内部类实例，而非静态内部类实例必须是寄存在外部类实例里）。</p>
+<h4 id="非静态内部类对象和外部类对象的关系"><a href="#非静态内部类对象和外部类对象的关系" class="headerlink" title="非静态内部类对象和外部类对象的关系"></a>非静态内部类对象和外部类对象的关系</h4><p>非静态内部类对象必须寄存在外部类对象里，而外部类对象则不必一定有非静态内部类对象寄存其中。因此外部类对象访问非静态内部类成员，可能非静态普通内部类对象根本不存在，而非静态内部类对象访问外部类成员时，外部类对象一定存在。</p>
+<p>非静态内部类不允许定义静态成员。</p>
+<p>##静态内部类<br>静态内部类属于外部类本身。（static关键字的作用是把类的成员变成类相关而不是实例相关）<br>静态内部类不能访问外部类的实例成员，只能访问外部类的类成员。<br>外部类不能直接访问静态内部类的成员，但可以使用静态内部类的类名作为调用者来访问静态内部类成员，也可以使用静态内部类对象作为调用者来访问静态内部类的实例成员。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class OutterClass</div><div class="line">&#123;</div><div class="line">	static class StaticInnerClass</div><div class="line">	&#123;</div><div class="line">		private static int prop1 = 2;</div><div class="line">		private int prop2 = 9;</div><div class="line">	&#125;</div><div class="line">	public void accessInnerProp()</div><div class="line">	&#123;</div><div class="line">		//System.out.println(prop1);</div><div class="line">		//上面代码错误</div><div class="line">		System.out.println(StaticInnerClass.prop1); //通过类名访问静态内部类的类成员</div><div class="line">		System.out.println(new StaticInnerClass().pro2); //通过实例访问静态内部类的实例成员</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>外部调用内部类的方法：<a href="http://blog.csdn.net/hanshileiai/article/details/6690012" target="_blank" rel="external">http://blog.csdn.net/hanshileiai/article/details/6690012</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/08/Java内部类/" data-id="cj3qjusx400096o40zl0pje4k" class="article-share-link">Partager</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/06/08/Java回收机制/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Récent</strong>
+      <div class="article-nav-title">
+        
+          Java回收机制
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/07/Java基本类型与包装类的区别/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ancien</strong>
+      <div class="article-nav-title">Java基本类型与包装类的区别</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Articles récents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/06/10/Java集合/">Java集合</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/08/Java回收机制/">Java回收机制</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/08/Java内部类/">Java内部类</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/07/Java基本类型与包装类的区别/">Java基本类型与包装类的区别</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/23/javascript引用类型/">javascript引用类型</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
