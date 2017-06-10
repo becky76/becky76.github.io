@@ -48,9 +48,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/becky76/becky76.github.io/blob/master/index.html"></form>
@@ -91,7 +91,7 @@
 </ol>
 <p>tip：当使用System.out.println方法来输出collection时，将输出[ele1,ele2,…]的形式，是因为所有的Collection实现类都重写了toString()方法。</p>
 <ol>
-<li>如果想依次访问集合里的每一个元素，则可以采用以下两种方式遍历集合元素。<br> (1) ##### 使用Iterator接口遍历集合元素。<pre><code>Iterator对象也被称为迭代器，只有存在一个被迭代的Collection，Iterator才有意义。有如下三个方法:
+<li>如果想依次访问集合里的每一个元素，则可以采用以下两种方式遍历集合元素。<br> (1) #### 使用Iterator接口遍历集合元素。<pre><code>Iterator对象也被称为迭代器，只有存在一个被迭代的Collection，Iterator才有意义。有如下三个方法:
 boolean hasNext()：如果还有没被遍历的元素，则返回true。
 Object next():返回集合的下个元素。
 void remove():集合上一次next()返回的集合元素。
@@ -108,7 +108,7 @@ while(it.hasNext())
 }
 &apos;&apos;&apos;
 Iterator是快速失败机制，一旦在__迭代过程中检测到该集合被修改__，程序立即引发ConcurrentModificationException异常。
-</code></pre> (2)  ##### 使用foreach循环遍历集合元素<pre><code>&apos;&apos;&apos;
+</code></pre> (2) #### 使用foreach循环遍历集合元素<pre><code>&apos;&apos;&apos;
 Collection fruits = new HashSet();
 fruits.add(&quot;Apple&quot;);
 fruits.add(&quot;Banana&quot;);
@@ -126,19 +126,19 @@ System.out.println(fruits);
 &apos;&apos;&apos;        与使用Iterator相似，foreach循环中的迭代变量也__不是集合元素本身__，系统只是依次把集合元素的__值__赋给迭代变量。同样，当使用foreach循环迭代访问集合元素时，该集合也不能被改变，否则引发ConcurrentModificationException异常
 </code></pre></li>
 </ol>
-<h3 id="Set集合（无序、不可重复）"><a href="#Set集合（无序、不可重复）" class="headerlink" title="Set集合（无序、不可重复）"></a>Set集合（无序、不可重复）</h3><p>Set集合不允许包含相同的元素，<strong>Set判断两个对象相同根据equals方法</strong>，只要两个对象用equals方法比较返回true，Set就会接受这两个对象。Set的使用方法基本同于Collection。<br>‘’’<br>Set fruits = new HashSet();<br>fruits.add(new String(“Apple”));<br>boolean result = fruits.add(new String(“Apple”)); //返回false<br>‘’’<br>    (1)##### HashSet<br>    HashSet是Set接口的典型实现，HashSet使用HASH算法来存储集合中的元素，因此具有良好的存取和查找性能。    当向HashSet集合中存入一个元素时，HashSet会调用该对象的hashCode()方法来得到该对象的hashCode值，然后根据该hashCode值决定该对象在HashSet中的存储位置。<br>    HashSet集合判断两个元素相等的标准是两个对象通过equals()方法比较相等，并且两个对象的hashCode()方法的返回值相等。    当向HashSet中添加可变对象时须谨慎，如果修改HashSet集合中的对象，可能导致该对象与集合中的其他对象相等，从而导致HashSet无法准确访问该对象。<br>    (2)##### LinkedHashSet     LinkedHashSet集合也是根据元素的hashCode值来决定元素的存储位置，但和HashSet不同的是，它同时使用<strong>链表</strong>维护元素的次序，这样使得元素看起来是以插入的顺序保存的。    LinkedHashSet需要维护元素的插入顺序，因此性能略低于HashSet的性能，但在迭代访问Set里的全部元素时(遍历)将有很好的性能(链表很适合进行遍历)<br>    (3)##### TreeSet        TreeSet是SortedSet接口的实现类，采用红黑树的数据结构来存储集合元素，确保集合元素处于排序（根据元素实际值的大小，而不是插入顺序）状态。有如下方法：<br>    Object first()：返回集合中的第一个元素。<br>    Object lower(Object e)：返回小于指定元素的集合中的最大元素。<br>    SortedSet subSet(fromElement,toElement):返回此Set的子集合，范围从fromElement到toElement。<br>    SortedSet headSet(toElement):返回小于toElement的元素组成的此Set子集。<br>    TreeSet支持两种排序方式：自然排序和定制排序。默认情况下采取自然排序。<br>        (a)###### 自然排序<br>        TreeSet会调用集合元素的compareTo(Object obj)方法来比较元素的关系大小，然后升序排列。Java提供了一个Comparable接口，该接口里定义了一个compareTo(Object obj)方法。实现该接口的类必须实现该方法，那么实现该接口的类的对象就可以比较大小。<br>        如果试图把一个对象添加到TreeSet，则该对象的类必须实现Comparable接口，否则引发ClassCastException异常。<br>        另，在实现compareTo(Object obj)方法时，需将比较对象obj强制类型转换成相同对象。当TreeSet添加对象时，若不是同一个类的对象则引发异常。<br>        TreeSet判断两个对象是否相等是根据compareTo(Object obj)方法比较是否返回0。<br>        (b)###### 定制排序<br>        通过Comparator接口，该接口里包含一个int compare(T o1, T o2)方法。        如果需要实现定制排序，则需要在创建TreeSet集合对象时，提供一个Comparator对象与该TreeSet集合关联，由该Comparator对象负责集合元素的排序逻辑。<br>        ‘’’<br>        TreeSet ts = new TreeSet(new Comparator()<br>        {<br>            public int compare(Object o1,Object o2)<br>            {<br>                M m1 = (M)o1;<br>                M m2 = (M)o2;<br>                return m1.age &gt; m2.age ? -1 : m1.age &lt; m2.age 1 ：0；<br>            }<br>        });<br>        ‘’’<br>    (4)##### EnumSet    EnumSet是一个专门为枚举类设计的集合类，EnumSet中所有元素都必须是指定枚举类型的枚举值，该枚举类型在创建EnumSet时显式、或隐式地指定。EnumSet的集合元素也是有序的，<br>　　它们以枚举值在Enum类内的定义顺序来决定集合元素的顺序</p>
-<h3 id="List（有序、可重复）集合"><a href="#List（有序、可重复）集合" class="headerlink" title="List（有序、可重复）集合"></a>List（有序、可重复）集合</h3><p>集合中的每个元素都有对应的顺序索引。List集合默认按元素的添加顺序设置元素的索引。<br><strong>List</strong>作为Collection接口的<strong>子接口</strong>（List是一个借口，不能实例化，只能，当然可以使用Collection接口里的全部方法，且由于List是有序即可，因此List集合添加了一些根据索引操作的方法：<br>void add(int index,Object element):将元素element插入到List集合的index处。<br>Object get(int index):返回集合index索引处的元素<br>int indexOf(Object o):返回对象o在List集合中第一次出现的位置索引<br>Object remove(int index):删除并返回index索引处的元尿素<br>Object set(int index, Object element):将index索引处的元素替换成element对象，返回新元素<br>List subList(int fromIndex, int toIndex):<br><strong>List判断两个对象相等只要通过equals()方法比较返回true即可</strong>。<br>与Set只提供一个iterator()方法不同，List还额外提供一个listIterator()方法，该方法返回一个ListIterator对象，ListIterator接口继承了Iterator接口，再次基础上添加了如下方法：hasPrevious()、previous()、add()。</p>
+<h3 id="Set集合（无序、不可重复）"><a href="#Set集合（无序、不可重复）" class="headerlink" title="Set集合（无序、不可重复）"></a>Set集合（无序、不可重复）</h3><p>Set集合不允许包含相同的元素，<strong>Set判断两个对象相同根据equals方法</strong>，只要两个对象用equals方法比较返回true，Set就会接受这两个对象。Set的使用方法基本同于Collection。<br>‘’’<br>Set fruits = new HashSet();<br>fruits.add(new String(“Apple”));<br>boolean result = fruits.add(new String(“Apple”)); //返回false<br>‘’’<br>    (1)### HashSet<br>    HashSet是Set接口的典型实现，HashSet使用HASH算法来存储集合中的元素，因此具有良好的存取和查找性能。    当向HashSet集合中存入一个元素时，HashSet会调用该对象的hashCode()方法来得到该对象的hashCode值，然后根据该hashCode值决定该对象在HashSet中的存储位置。<br>    HashSet集合判断两个元素相等的标准是两个对象通过equals()方法比较相等，并且两个对象的hashCode()方法的返回值相等。    当向HashSet中添加可变对象时须谨慎，如果修改HashSet集合中的对象，可能导致该对象与集合中的其他对象相等，从而导致HashSet无法准确访问该对象。<br>    (2)### LinkedHashSet     LinkedHashSet集合也是根据元素的hashCode值来决定元素的存储位置，但和HashSet不同的是，它同时使用<strong>链表</strong>维护元素的次序，这样使得元素看起来是以插入的顺序保存的。    LinkedHashSet需要维护元素的插入顺序，因此性能略低于HashSet的性能，但在迭代访问Set里的全部元素时(遍历)将有很好的性能(链表很适合进行遍历)<br>    (3)### TreeSet        TreeSet是SortedSet接口的实现类，采用红黑树的数据结构来存储集合元素，确保集合元素处于排序（根据元素实际值的大小，而不是插入顺序）状态。有如下方法：<br>    Object first()：返回集合中的第一个元素。<br>    Object lower(Object e)：返回小于指定元素的集合中的最大元素。<br>    SortedSet subSet(fromElement,toElement):返回此Set的子集合，范围从fromElement到toElement。<br>    SortedSet headSet(toElement):返回小于toElement的元素组成的此Set子集。<br>    TreeSet支持两种排序方式：自然排序和定制排序。默认情况下采取自然排序。<br>        (a)#### 自然排序<br>        TreeSet会调用集合元素的compareTo(Object obj)方法来比较元素的关系大小，然后升序排列。Java提供了一个Comparable接口，该接口里定义了一个compareTo(Object obj)方法。实现该接口的类必须实现该方法，那么实现该接口的类的对象就可以比较大小。<br>        如果试图把一个对象添加到TreeSet，则该对象的类必须实现Comparable接口，否则引发ClassCastException异常。<br>        另，在实现compareTo(Object obj)方法时，需将比较对象obj强制类型转换成相同对象。当TreeSet添加对象时，若不是同一个类的对象则引发异常。<br>        TreeSet判断两个对象是否相等是根据compareTo(Object obj)方法比较是否返回0。<br>        (b)#### 定制排序<br>        通过Comparator接口，该接口里包含一个int compare(T o1, T o2)方法。        如果需要实现定制排序，则需要在创建TreeSet集合对象时，提供一个Comparator对象与该TreeSet集合关联，由该Comparator对象负责集合元素的排序逻辑。<br>        ‘’’<br>        TreeSet ts = new TreeSet(new Comparator()<br>        {<br>            public int compare(Object o1,Object o2)<br>            {<br>                M m1 = (M)o1;<br>                M m2 = (M)o2;<br>                return m1.age &gt; m2.age ? -1 : m1.age &lt; m2.age 1 ：0；<br>            }<br>        });<br>        ‘’’<br>    (4)### EnumSet    EnumSet是一个专门为枚举类设计的集合类，EnumSet中所有元素都必须是指定枚举类型的枚举值，该枚举类型在创建EnumSet时显式、或隐式地指定。EnumSet的集合元素也是有序的，<br>　　它们以枚举值在Enum类内的定义顺序来决定集合元素的顺序</p>
+<h2 id="List（有序、可重复）集合"><a href="#List（有序、可重复）集合" class="headerlink" title="List（有序、可重复）集合"></a>List（有序、可重复）集合</h2><p>集合中的每个元素都有对应的顺序索引。List集合默认按元素的添加顺序设置元素的索引。<br><strong>List</strong>作为Collection接口的<strong>子接口</strong>（List是一个借口，不能实例化，只能，当然可以使用Collection接口里的全部方法，且由于List是有序即可，因此List集合添加了一些根据索引操作的方法：<br>void add(int index,Object element):将元素element插入到List集合的index处。<br>Object get(int index):返回集合index索引处的元素<br>int indexOf(Object o):返回对象o在List集合中第一次出现的位置索引<br>Object remove(int index):删除并返回index索引处的元尿素<br>Object set(int index, Object element):将index索引处的元素替换成element对象，返回新元素<br>List subList(int fromIndex, int toIndex):<br><strong>List判断两个对象相等只要通过equals()方法比较返回true即可</strong>。<br>与Set只提供一个iterator()方法不同，List还额外提供一个listIterator()方法，该方法返回一个ListIterator对象，ListIterator接口继承了Iterator接口，再次基础上添加了如下方法：hasPrevious()、previous()、add()。</p>
 <pre><code>##### ArrayList和Vector实现类     ArrayList和Vector是基于数组实现的List类，封装了一个动态、允许再分配的Object[]数组。（一次性增加initialCapacity可以提高性能）。ArrayList和Vector用法几乎一样，但Vector是一个古老的集合，虽然它线程安全，还提供Stack子类（可用LinkedList代替），但依然不推荐使用。
 ##### LinkedList实现类
 LinkedList类是List接口的实现类，且实现了Deque接口，因此可以当成栈来使用。
-</code></pre><h3 id="Queue集合"><a href="#Queue集合" class="headerlink" title="Queue集合"></a>Queue集合</h3><p>Queue用于模拟队列这种数据结构，FIFO。通常，队列不允许随机访问队列中的元素。Queue接口定义了如下方法：<br>void add(Object e):将指定元素加入此队列的尾部。<br>Object element():获取头部元素，但不删除。<br>boolean offer(Object e):类似于add()、但容量有限时更好<br>Object peek():获取头部元素，但不删除。<br>Object poll():获取头部元素，并删除。<br>Object remove():获取头部元素，并删除。<br>    (1)##### PriorityQueue实现类<br>     保存队列元素的顺序不是按加入队列的顺序，而是按队列元素的大小进行重新排序。<br>    (2)##### Deque接口<br>     Deque接口是Queue接口的子接口，代表一个双端队列，但也能当作栈来使用。它定义了一些双端方法：<br>     void addFirst(Object e):<br>     void addLast(Object e):<br>     Iterator descendingnIterator():<br>     Object getFirst():<br>     Object getLast():<br>     Deque接口提供了一个典型的实现类:ArrayDeque，当作栈来使用。</p>
-<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><p>Map用于保存具有映射关系的数据，因此Map保存着两组值，一组值用于保存Map里的key，另外一组值用于保存Map里的value，key和value都有可以是任何引用类型的数据。key不允许重复，即同一个Map对象的任何两个key通过equals方法比较结果总是返回false。<br>如果把Map里的所有key放在一起来看，他们就组成了一个Set集合（无序、不重复），可通过keySet()方法返回Map里的所有key组成的Set集合。<br>如果把Map里的所有value放在一起来看，它们又类似于一个List:元素之间可重复，每个元素可以根据索引来查找。如果需要从List集合中取出元素，则需要提供该元素的数字索引你；如果需要从Map中取出元素，则需要提供该元素的key索引。<br>Map接口中定义了如下常用方法：<br>void clear():删除该Map对象的所有key-value对。<br>boolean containsKey(Object key):查询Map中是否包含指定的key。<br>boolean containsValue(Object value):查询Map中是否包含一个或多个value。<br>boolean isEmpty():查询该Map是否为空<br>Object get(Object key):返回指定key所对应的value。<br>Object remove(Object key):删除指定key所对应的key-value对。如果该key不存在返回null。<br>Object put(Object key,Object value):添加一个key-value对，如果Map中已存在该key，则将进到key-value覆盖原来的key-value对。<br>Set keySet():返回该Map中所有key组成的Set集合。<br>Collection values():返回该Map中所有value组成的Collection。<br>int size():返回该Map里的key-value对的个数。<br>toString():返回如下格式的字符串：{key1=value1，key2=value2,…}<br>    (1)##### HashMap和Hashtable实现类<br>    这二者的关系完全类似与ArrayList和Vector（Vector古老、方法烦琐、线程安全、性能稍差），同时HashMap允许null作为key或value。<br>    为了存储、获取HashMap、Hashtable中的对象，用作key的对象必须实现hashCode()和equals()方法。<br>    和HashSet集合不能保证元素的顺序一样，HashMap也不能保证key-value对的顺序。类似于HashSet判断两个key是否相等的标准也是: 两个key通过equals()方法比较返回true，同时两个key的hashCode值也相等。与HashSet类似，如果使用可变对象作为HashMap、Hashtable的key，并且程序修改了key对象，则肯能再无法准确方位到被修改该过的key<br>    (2)##### LinkedHashMap实现类    LinkedHashMap是HashMap的子类，它使用双向链表来维护key-value对的次序。该链表维护Map的迭代顺序与key-value对的插入顺序保持一致。<br>    (3)##### 使用Properties读写属性文件    Properties类是Hashtable类的子类。Properties类可以把Map对象和属性文件关联起来，从而可以把Map对象中的key-value对写入到属性文件中，也可以把属性文件中的”属性名=属性值”加载到Map对象中。有如下三个方法：<br>    String getProperty(String key):获取Properties中指定属性名对应的属性值。<br>    String getProperty(String key,String defaultValue):同上，若不存在知道那个的key则指定默认值。<br>    Object setProperty(String key,String value):设置属性值。<br>    void load(InputStream inStream):从属性文件（以输入流表示）中加载key-value对，追加到Properties里。<br>    void score(OutputStream out,String comments):输出到指定的属性文件中（以输出流表示）。<br>    (4)##### SortedMap接口和TreeMap实现类    TreeMap是一个红黑树结构，每个key-value对即为红黑树的一个节点。TreeMap存储节点时，需要根据key进行排序。所以TreeMap可以保证所有的key-value对处于有序状态。同样，TreeMap也有两种排序方式: 自然排序、定制排序。<br>        (a)###### 自然排序<br>        TreeMap的key必须实现Comparable接口，而且所有key应该是同一个类的对象，否则ClassCastException异常。<br>        (b)###### 定制排序<br>        创建TreeMap时，传入一个Comparator对象，该对象负责排序。<br>    (5)##### WeakHashMap实现类    WeakHashMap与HashMap的用法基本相似。区别在于，HashMap的key保留了对实际对象的”强引用”，这意味着只要该HashMap对象不被销毁，该HashMap所引用的对象就不会被垃圾回收。但WeakHashMap的key只保留了对实际对象的弱引用，这意味着如果WeakHashMap对象的key所引用的对象没有被其他强引用变量所引用，则这些key所引用的对象可能被垃圾回收，当垃圾回收了该key所对应的实际对象之后，WeakHashMap也可能自动删除这些key所对应的key-value对.<br>    (6)##### IdentityHashMap实现类<br>    entityHashMap的实现机制与HashMap基本相似，在IdentityHashMap中，当且仅当两个key严格相等(key1 == key2)时，IdentityHashMap才认为两个key相等.<br>    (7)##### EnumMap实现类    EnumMap是一个与枚举类一起使用的Map实现，EnumMap中的所有key都必须是单个枚举类的枚举值。创建EnumMap时必须显式或隐式指定它对应的枚举类。EnumMap根据key的自然顺序来维护key-value对的顺序。</p>
+</code></pre><h2 id="Queue集合"><a href="#Queue集合" class="headerlink" title="Queue集合"></a>Queue集合</h2><p>Queue用于模拟队列这种数据结构，FIFO。通常，队列不允许随机访问队列中的元素。Queue接口定义了如下方法：<br>void add(Object e):将指定元素加入此队列的尾部。<br>Object element():获取头部元素，但不删除。<br>boolean offer(Object e):类似于add()、但容量有限时更好<br>Object peek():获取头部元素，但不删除。<br>Object poll():获取头部元素，并删除。<br>Object remove():获取头部元素，并删除。<br>    (1)### PriorityQueue实现类<br>     保存队列元素的顺序不是按加入队列的顺序，而是按队列元素的大小进行重新排序。<br>    (2)### Deque接口<br>     Deque接口是Queue接口的子接口，代表一个双端队列，但也能当作栈来使用。它定义了一些双端方法：<br>     void addFirst(Object e):<br>     void addLast(Object e):<br>     Iterator descendingnIterator():<br>     Object getFirst():<br>     Object getLast():<br>     Deque接口提供了一个典型的实现类:ArrayDeque，当作栈来使用。</p>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><p>Map用于保存具有映射关系的数据，因此Map保存着两组值，一组值用于保存Map里的key，另外一组值用于保存Map里的value，key和value都有可以是任何引用类型的数据。key不允许重复，即同一个Map对象的任何两个key通过equals方法比较结果总是返回false。<br>如果把Map里的所有key放在一起来看，他们就组成了一个Set集合（无序、不重复），可通过keySet()方法返回Map里的所有key组成的Set集合。<br>如果把Map里的所有value放在一起来看，它们又类似于一个List:元素之间可重复，每个元素可以根据索引来查找。如果需要从List集合中取出元素，则需要提供该元素的数字索引你；如果需要从Map中取出元素，则需要提供该元素的key索引。<br>Map接口中定义了如下常用方法：<br>void clear():删除该Map对象的所有key-value对。<br>boolean containsKey(Object key):查询Map中是否包含指定的key。<br>boolean containsValue(Object value):查询Map中是否包含一个或多个value。<br>boolean isEmpty():查询该Map是否为空<br>Object get(Object key):返回指定key所对应的value。<br>Object remove(Object key):删除指定key所对应的key-value对。如果该key不存在返回null。<br>Object put(Object key,Object value):添加一个key-value对，如果Map中已存在该key，则将进到key-value覆盖原来的key-value对。<br>Set keySet():返回该Map中所有key组成的Set集合。<br>Collection values():返回该Map中所有value组成的Collection。<br>int size():返回该Map里的key-value对的个数。<br>toString():返回如下格式的字符串：{key1=value1，key2=value2,…}<br>    (1)### HashMap和Hashtable实现类<br>    这二者的关系完全类似与ArrayList和Vector（Vector古老、方法烦琐、线程安全、性能稍差），同时HashMap允许null作为key或value。<br>    为了存储、获取HashMap、Hashtable中的对象，用作key的对象必须实现hashCode()和equals()方法。<br>    和HashSet集合不能保证元素的顺序一样，HashMap也不能保证key-value对的顺序。类似于HashSet判断两个key是否相等的标准也是: 两个key通过equals()方法比较返回true，同时两个key的hashCode值也相等。与HashSet类似，如果使用可变对象作为HashMap、Hashtable的key，并且程序修改了key对象，则肯能再无法准确方位到被修改该过的key<br>    (2)### LinkedHashMap实现类    LinkedHashMap是HashMap的子类，它使用双向链表来维护key-value对的次序。该链表维护Map的迭代顺序与key-value对的插入顺序保持一致。<br>    (3)### 使用Properties读写属性文件    Properties类是Hashtable类的子类。Properties类可以把Map对象和属性文件关联起来，从而可以把Map对象中的key-value对写入到属性文件中，也可以把属性文件中的”属性名=属性值”加载到Map对象中。有如下三个方法：<br>    String getProperty(String key):获取Properties中指定属性名对应的属性值。<br>    String getProperty(String key,String defaultValue):同上，若不存在知道那个的key则指定默认值。<br>    Object setProperty(String key,String value):设置属性值。<br>    void load(InputStream inStream):从属性文件（以输入流表示）中加载key-value对，追加到Properties里。<br>    void score(OutputStream out,String comments):输出到指定的属性文件中（以输出流表示）。<br>    (4)### SortedMap接口和TreeMap实现类    TreeMap是一个红黑树结构，每个key-value对即为红黑树的一个节点。TreeMap存储节点时，需要根据key进行排序。所以TreeMap可以保证所有的key-value对处于有序状态。同样，TreeMap也有两种排序方式: 自然排序、定制排序。<br>        (a)#### 自然排序<br>        TreeMap的key必须实现Comparable接口，而且所有key应该是同一个类的对象，否则ClassCastException异常。<br>        (b)#### 定制排序<br>        创建TreeMap时，传入一个Comparator对象，该对象负责排序。<br>    (5)##### WeakHashMap实现类    WeakHashMap与HashMap的用法基本相似。区别在于，HashMap的key保留了对实际对象的”强引用”，这意味着只要该HashMap对象不被销毁，该HashMap所引用的对象就不会被垃圾回收。但WeakHashMap的key只保留了对实际对象的弱引用，这意味着如果WeakHashMap对象的key所引用的对象没有被其他强引用变量所引用，则这些key所引用的对象可能被垃圾回收，当垃圾回收了该key所对应的实际对象之后，WeakHashMap也可能自动删除这些key所对应的key-value对.<br>    (6)### IdentityHashMap实现类<br>    entityHashMap的实现机制与HashMap基本相似，在IdentityHashMap中，当且仅当两个key严格相等(key1 == key2)时，IdentityHashMap才认为两个key相等.<br>    (7)### EnumMap实现类    EnumMap是一个与枚举类一起使用的Map实现，EnumMap中的所有key都必须是单个枚举类的枚举值。创建EnumMap时必须显式或隐式指定它对应的枚举类。EnumMap根据key的自然顺序来维护key-value对的顺序。</p>
 <h2 id="Collections类–操作集合的工具类"><a href="#Collections类–操作集合的工具类" class="headerlink" title="Collections类–操作集合的工具类"></a>Collections类–操作集合的工具类</h2><p>Java提供了一个操作Set、List和Map等集合的工具类，该工具类里提供了大量方法对集合元素进行排序、查询和修改等操作，还提供了将集合对象设置为不可变、对集合对象实现同步控制等方法。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/10/Java集合/" data-id="cj3qjusuy00026o40an2g3jot" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/10/Java集合/" data-id="cj3rbxpnw0003os40xeikdq59" class="article-share-link">Share</a>
       
       
     </footer>
@@ -176,7 +176,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/08/Java回收机制/" data-id="cj3qjusua00006o40roj4kiek" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/08/Java回收机制/" data-id="cj3rbxpnf0001os400s6vbx40" class="article-share-link">Share</a>
       
       
     </footer>
@@ -225,7 +225,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/08/Java内部类/" data-id="cj3qjusx400096o40zl0pje4k" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/08/Java内部类/" data-id="cj3rbxpn10000os40bbyxtc9t" class="article-share-link">Share</a>
       
       
     </footer>
@@ -267,7 +267,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/07/Java基本类型与包装类的区别/" data-id="cj3qjusuq00016o4018k8npom" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/07/Java基本类型与包装类的区别/" data-id="cj3rbxpno0002os405oygwwsg" class="article-share-link">Share</a>
       
       
     </footer>
@@ -316,7 +316,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/23/javascript引用类型/" data-id="cj3qjusvk00066o402tqtu0wd" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/23/javascript引用类型/" data-id="cj3rbxpp40008os407tqd4wl3" class="article-share-link">Share</a>
       
       
     </footer>
@@ -357,7 +357,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/23/javascript垃圾收集/" data-id="cj3qjusvg00056o401hame479" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/23/javascript垃圾收集/" data-id="cj3rbxpol0007os40rh0zdjuv" class="article-share-link">Share</a>
       
       
     </footer>
@@ -396,7 +396,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/15/javascript实现放大镜/" data-id="cj3qjusvr00076o40wos1pnzh" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/15/javascript实现放大镜/" data-id="cj3rbxpoi0006os40lk4eh4r2" class="article-share-link">Share</a>
       
       
     </footer>
@@ -440,7 +440,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/09/第二篇/" data-id="cj3qjuswa00086o40chdf4bnj" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/09/第二篇/" data-id="cj3rbxpp60009os4030hvcfnj" class="article-share-link">Share</a>
       
       
     </footer>
@@ -495,7 +495,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/My-first/" data-id="cj3qjusv300036o403g9ibsl0" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/My-first/" data-id="cj3rbxpoa0005os40udpkqsdi" class="article-share-link">Share</a>
       
       
     </footer>
@@ -540,7 +540,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/hello-world/" data-id="cj3qjusv600046o40yvpjrc2l" class="article-share-link">Partager</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/hello-world/" data-id="cj3rbxpo10004os40hsoa40p4" class="article-share-link">Share</a>
       
       
     </footer>
@@ -575,7 +575,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
@@ -612,7 +612,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2017 John Doe<br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
