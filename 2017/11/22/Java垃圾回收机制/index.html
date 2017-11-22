@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java垃圾回收机制 | Becky</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="什么是 Java 堆内存堆是在JVM启动时创建的，主要用来维护运行时数据，如运行过程中创建的对象和数组都是基于这块内存空间。Java堆是非常重要的元素，如果我们动态创建的对象没有得到及时回收，持续堆积，最后会导致堆空间占满，内存溢出。
+因此，Java提供了一种垃圾回收机制，在后台创建一个守护进程。该进程会在内存紧张的时候自动跳出来，把堆空间的垃圾全部进行回收，从而保证程序的正常运行。
+什么是垃圾所">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java垃圾回收机制">
+<meta property="og:url" content="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/11/22/Java垃圾回收机制/index.html">
+<meta property="og:site_name" content="Becky">
+<meta property="og:description" content="什么是 Java 堆内存堆是在JVM启动时创建的，主要用来维护运行时数据，如运行过程中创建的对象和数组都是基于这块内存空间。Java堆是非常重要的元素，如果我们动态创建的对象没有得到及时回收，持续堆积，最后会导致堆空间占满，内存溢出。
+因此，Java提供了一种垃圾回收机制，在后台创建一个守护进程。该进程会在内存紧张的时候自动跳出来，把堆空间的垃圾全部进行回收，从而保证程序的正常运行。
+什么是垃圾所">
+<meta property="og:image" content="http://incdn1.b0.upaiyun.com/2017/10/de3b5b129b7c7dd9659ef0cc899b8732.jpg">
+<meta property="og:image" content="http://incdn1.b0.upaiyun.com/2017/10/c8087da0f5a4a03f894d06af19b465f7.png">
+<meta property="og:image" content="http://incdn1.b0.upaiyun.com/2017/10/2ea8dc60e289787d76ba38239b6604e0.png">
+<meta property="og:image" content="http://incdn1.b0.upaiyun.com/2017/10/a4ae0fc76b676e9ab41f7a0a87fb6072.png">
+<meta property="og:image" content="http://incdn1.b0.upaiyun.com/2017/10/c3632abfa4c296cb613da3c5554cbf00.png">
+<meta property="og:updated_time" content="2017-11-22T14:32:06.510Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java垃圾回收机制">
+<meta name="twitter:description" content="什么是 Java 堆内存堆是在JVM启动时创建的，主要用来维护运行时数据，如运行过程中创建的对象和数组都是基于这块内存空间。Java堆是非常重要的元素，如果我们动态创建的对象没有得到及时回收，持续堆积，最后会导致堆空间占满，内存溢出。
+因此，Java提供了一种垃圾回收机制，在后台创建一个守护进程。该进程会在内存紧张的时候自动跳出来，把堆空间的垃圾全部进行回收，从而保证程序的正常运行。
+什么是垃圾所">
+<meta name="twitter:image" content="http://incdn1.b0.upaiyun.com/2017/10/de3b5b129b7c7dd9659ef0cc899b8732.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Becky" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Becky</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/becky76/becky76.github.io/blob/master/index.html"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Java垃圾回收机制" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/22/Java垃圾回收机制/" class="article-date">
+  <time datetime="2017-11-22T14:11:02.000Z" itemprop="datePublished">2017-11-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java垃圾回收机制
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="什么是-Java-堆内存"><a href="#什么是-Java-堆内存" class="headerlink" title="什么是 Java 堆内存"></a>什么是 Java 堆内存</h2><p>堆是在JVM启动时创建的，主要用来维护运行时数据，如运行过程中创建的对象和数组都是基于这块内存空间。Java堆是非常重要的元素，如果我们动态创建的对象没有得到及时回收，持续堆积，最后会导致堆空间占满，内存溢出。</p>
+<p>因此，Java提供了一种垃圾回收机制，在<strong>后台创建一个守护进程</strong>。该进程会在内存紧张的时候自动跳出来，把堆空间的垃圾全部进行回收，从而保证程序的正常运行。</p>
+<h2 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h2><p>所谓“垃圾”，就是指所有不再存活的对象。常见的<strong>判断是否存活</strong>有两种方法：引用计数法和可达性分析。</p>
+<h3 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h3><p>为每一个创建的对象分配一个引用计数器，用来存储该对象被引用的个数。当该个数为零，意味着没有人再使用这个对象，可以认为“对象死亡”。但是，这种方案存在严重的问题，就是无法检测“循环引用”：当两个对象互相引用，即时它俩都不被外界任何东西引用，它俩的计数都不为零，因此永远不会被回收。而实际上对于开发者而言，这两个对象已经完全没有用处了。</p>
+<h3 id="可达性分析"><a href="#可达性分析" class="headerlink" title="可达性分析"></a>可达性分析</h3><p>这种方案是目前主流语言里采用的对象存活性判断方案。基本思路是把所有引用的对象想象成一棵树，从树的根结点 GC Roots 出发，持续遍历找出所有连接的树枝对象，这些对象则被称为“可达”对象，或称“存活”对象。其余的对象则被视为“死亡”的“不可达”对象，或称“垃圾”。<br> <img src="http://incdn1.b0.upaiyun.com/2017/10/de3b5b129b7c7dd9659ef0cc899b8732.jpg" alt="image"></p>
+<h2 id="回收垃圾的方式"><a href="#回收垃圾的方式" class="headerlink" title="回收垃圾的方式"></a>回收垃圾的方式</h2><p>上面已经知道，所有 GC Roots 不可达的对象都称为垃圾，参考下图，黑色的表示垃圾，灰色表示存活对象，绿色表示空白空间。<br><img src="http://incdn1.b0.upaiyun.com/2017/10/c8087da0f5a4a03f894d06af19b465f7.png" alt="image"></p>
+<h3 id="标记-清理"><a href="#标记-清理" class="headerlink" title="标记-清理"></a>标记-清理</h3><p>第一步，所谓“标记”就是利用可达性遍历堆内存，把“存活”对象和“垃圾”对象进行标记，得到的结果如上图；<br>第二步，既然“垃圾”已经标记好了，那我们再遍历一遍，把所有“垃圾”对象所占的空间直接 清空 即可。</p>
+<p>结果如下：<br><img src="http://incdn1.b0.upaiyun.com/2017/10/2ea8dc60e289787d76ba38239b6604e0.png" alt="image"><br>这便是 标记－清理 方案，简单方便 ，但是容易产生 内存碎片。</p>
+<h3 id="标记-整理"><a href="#标记-整理" class="headerlink" title="标记-整理"></a>标记-整理</h3><p>既然上面的方法会产生内存碎片，那好，我在清理的时候，把所有 存活对象扎堆到同一个地方，让它们待在一起，这样就没有内存碎片了。</p>
+<p>结果如下：<br><img src="http://incdn1.b0.upaiyun.com/2017/10/a4ae0fc76b676e9ab41f7a0a87fb6072.png" alt="image"></p>
+<p>这两种方案适合 存活对象多，垃圾少 的情况，它只需要清理掉少量的垃圾，然后挪动下存活对象就可以了。</p>
+<h3 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h3><p>这种方法比较粗暴，直接把堆内存分成两部分，一段时间内只允许在其中一块内存上进行分配，当这块内存被分配完后，则执行垃圾回收，把所有 存活 对象全部复制到另一块内存上，当前内存则直接全部清空。<br>参考下图：<br><img src="http://incdn1.b0.upaiyun.com/2017/10/c3632abfa4c296cb613da3c5554cbf00.png" alt="image"></p>
+<p>起初时只使用上面部分的内存，直到内存使用完毕，才进行垃圾回收，把所有存活对象搬到下半部分，并把上半部分进行清空。</p>
+<p>这种做法不容易产生碎片，也简单粗暴；但是，它意味着你在一段时间内只能使用一部分的内存，超过这部分内存的话就意味着堆内存里频繁的 复制清空。</p>
+<p>这种方案适合 存活对象少，垃圾多 的情况，这样在复制时就不需要复制多少对象过去，多数垃圾直接被清空处理。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/11/22/Java垃圾回收机制/" data-id="cjab5eeb100038o4016dyk6ki" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/08/30/单例模式/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">单例模式</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/11/22/Java垃圾回收机制/">Java垃圾回收机制</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/30/单例模式/">单例模式</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/15/Java多线程/">Java多线程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/13/Java的I-O流/">Java的I/O流</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/">由ListNode引发的类中定义自身类的对象……</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

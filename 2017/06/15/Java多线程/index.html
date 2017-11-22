@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java多线程 | Becky</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="几乎所有的操作系统都支持同时运行多个任务，所有运行中的任务通常对应一个进程。进程是处于运行过程中的程序，是系统进行资源分配和调度的一个独立单位。当一个程序运行时，内部可能包含了多个顺序执行流，每个顺序执行流就是一个线程。不是所有的多线程代码都可以用单线程来实现，比如生产者-消费者模型。
+
+并行：多个cpu实例或者多台机器同时执行一段处理逻辑，是真正的同时。
+并发：在同一时间间隔内发生。通过cpu调">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程">
+<meta property="og:url" content="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/15/Java多线程/index.html">
+<meta property="og:site_name" content="Becky">
+<meta property="og:description" content="几乎所有的操作系统都支持同时运行多个任务，所有运行中的任务通常对应一个进程。进程是处于运行过程中的程序，是系统进行资源分配和调度的一个独立单位。当一个程序运行时，内部可能包含了多个顺序执行流，每个顺序执行流就是一个线程。不是所有的多线程代码都可以用单线程来实现，比如生产者-消费者模型。
+
+并行：多个cpu实例或者多台机器同时执行一段处理逻辑，是真正的同时。
+并发：在同一时间间隔内发生。通过cpu调">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1689841-383f7101e6588094.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&_=5479442">
+<meta property="og:updated_time" content="2017-06-15T03:49:55.800Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程">
+<meta name="twitter:description" content="几乎所有的操作系统都支持同时运行多个任务，所有运行中的任务通常对应一个进程。进程是处于运行过程中的程序，是系统进行资源分配和调度的一个独立单位。当一个程序运行时，内部可能包含了多个顺序执行流，每个顺序执行流就是一个线程。不是所有的多线程代码都可以用单线程来实现，比如生产者-消费者模型。
+
+并行：多个cpu实例或者多台机器同时执行一段处理逻辑，是真正的同时。
+并发：在同一时间间隔内发生。通过cpu调">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1689841-383f7101e6588094.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&_=5479442">
+  
+    <link rel="alternate" href="/atom.xml" title="Becky" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Becky</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/becky76/becky76.github.io/blob/master/index.html"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Java多线程" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/15/Java多线程/" class="article-date">
+  <time datetime="2017-06-15T01:28:24.000Z" itemprop="datePublished">2017-06-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java多线程
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>几乎所有的操作系统都支持同时运行多个任务，所有运行中的任务通常对应一个进程。进程是处于运行过程中的程序，是系统进行资源分配和调度的一个独立单位。<br>当一个程序运行时，内部可能包含了多个顺序执行流，每个顺序执行流就是一个线程。<br>不是所有的多线程代码都可以用单线程来实现，比如生产者-消费者模型。</p>
+<ul>
+<li>并行：多个cpu实例或者多台机器同时执行一段处理逻辑，是真正的同时。</li>
+<li>并发：在同一时间间隔内发生。通过cpu调度算法，让用户看上去同时执行，实际上从cpu操作层面不是真正的同时。</li>
+</ul>
+<h2 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h2><ol>
+<li><strong>继承Thread类</strong><br>（1）定义Thread类的子类，并重写该类的run方法，该run方法的方法体就代表了线程要完成的任务。因此把run()方法称为执行体。<br>（2）创建Thread子类的实例，即创建了线程对象。<br>（3）调用线程对象的start()方法来启动该线程。<br>‘’’<br>public class FirstThreadTest extends Thread{<br> int i = 0;<br> //重写run方法，run方法的方法体就是线程执行体<br> public void run()<br> {  <pre><code>for(;i&lt;100;i++){  
+System.out.println(getName()+&quot;  &quot;+i);           
+}  
+</code></pre> }<br> public static void main(String[] args)<br> {  <pre><code>for(int i = 0;i&lt; 100;i++)  
+{                      System.out.println(Thread.currentThread().getName()+&quot;  : &quot;+i);  
+    if(i==20)  
+    {  
+        new FirstThreadTest().start();  
+        new FirstThreadTest().start();  
+    }  
+}  
+</code></pre> }  </li>
+</ol>
+<p>}<br>‘’’<br>该程序有三个线程，除了显式创建并启动的2个线程，还有1个Java运行时默认的主线程。主线程的线程执行体是main()方法的方法体。<br>当线程类继承Thread类时，直接使用this即可获取当前线程。<br>Thread.currentThread()：currentThread()方法是Thread类的静态方法，返回当前正在执行的线程对象<br>getName():是Thread类的实例方法，返回调用该方法的线程名字</p>
+<ol>
+<li><p><strong>实现Runnable接口</strong><br>（1）定义runnable接口的实现类，并重写该接口的run()方法，该run()方法的方法体同样是该线程的线程执行体。<br>（2）创建Runnable实现类的实例，并以此实例作为Thread的target来创建Thread对象，该Thread对象才是真正的线程对象。<br>（3）调用线程对象的start()方法来启动该线程<br>‘’’<br>public class RunnableThreadTest implements Runnable<br>{<br> private int i;<br> public void run()<br> {  </p>
+<pre><code>for(i = 0;i &lt;100;i++)  
+{  
+    System.out.println(Thread.currentThread().getName()+&quot; &quot;+i);  
+}  
+</code></pre><p> }<br> public static void main(String[] args)<br> {  </p>
+<pre><code>for(int i = 0;i &lt; 100;i++)  
+{  
+    System.out.println(Thread.currentThread().getName()+&quot; &quot;+i);  
+    if(i==20)  
+    {  
+        RunnableThreadTest rtt = new RunnableThreadTest();  
+        new Thread(rtt,&quot;新线程1&quot;).start();  
+        new Thread(rtt,&quot;新线程2&quot;).start();  
+    }  
+}    
+</code></pre><p> }<br>}<br>‘’’</p>
+</li>
+<li><p><strong>使用Callable和Future</strong><br>（1）创建Callable接口的实现类，并实现call()方法，该call()方法将作为线程执行体，并且有返回值。<br>（2）创建Callable实现类的实例，使用FutureTask类来包装Callable对象，该FutureTask对象封装了该Callable对象的call()方法的返回值。<br>（3）使用FutureTask对象作为Thread对象的target创建并启动新线程。<br>（4）调用FutureTask对象的get()方法来获得子线程执行结束后的返回值<br>call()比run()方法功能强大，call()可以有返回值，也可以声明抛出异常<br>‘’’<br>import java.util.concurrent.Callable;<br>import java.util.concurrent.ExecutionException;<br>import java.util.concurrent.FutureTask;  </p>
+</li>
+</ol>
+<p>public class CallableThreadTest implements Callable<integer><br>{<br>    //实现call(),作为线程执行体<br>    @Override<br>    public Integer call() throws Exception<br>    {<br>        int i = 0;<br>        for(;i&lt;100;i++)<br>        {<br>            System.out.println(Thread.currentThread().getName()+” “+i);<br>        }<br>        return i;<br>    }  </integer></p>
+<pre><code>public static void main(String[] args)  
+{  
+    CallableThreadTest ctt = new CallableThreadTest();  
+    FutureTask&lt;Integer&gt; ft = new FutureTask&lt;&gt;(ctt);  
+    for(int i = 0;i &lt; 100;i++)  
+    {                              
+        System.out.println(Thread.currentThread().getName()+&quot; 的循环变量i的值&quot;+i);  
+        if(i==20)  
+        {  
+            new Thread(ft,&quot;有返回值的线程&quot;).start();  
+        }  
+    }  
+    try  
+    {  
+        System.out.println(&quot;子线程的返回值：&quot;+ft.get());  
+    } catch (InterruptedException e)  
+    {  
+        e.printStackTrace();  
+    } catch (ExecutionException e)  
+    {  
+        e.printStackTrace();  
+    }    
+}   
+</code></pre><p>}  </p>
+<h3 id="创建线程的三种方式的对比"><a href="#创建线程的三种方式的对比" class="headerlink" title="创建线程的三种方式的对比"></a>创建线程的三种方式的对比</h3><p>采用实现Runnable、Callable接口的方式创见多线程时，</p>
+<ul>
+<li>优势是：线程类只是实现了Runnable接口或Callable接口，还可以继承其他类。在这种方式下，多个线程可以共享同一个target对象，所以非常适合多个相同线程来处理同一份资源的情况，从而可以将CPU、代码和数据分开，形成清晰的模型，较好地体现了面向对象的思想。</li>
+<li>劣势是：编程稍微复杂，如果要访问当前线程，则必须使用Thread.currentThread()方法。</li>
+</ul>
+<p>使用继承Thread类的方式创建多线程时</p>
+<ul>
+<li>优势是：编写简单，如果需要访问当前线程，则无需使用Thread.currentThread()方法，直接使用this即可获得当前线程。</li>
+<li>劣势是：线程类已经继承了Thread类，所以不能再继承其他父类。</li>
+</ul>
+<h2 id="线程状态"><a href="#线程状态" class="headerlink" title="线程状态"></a>线程状态</h2><p><img src="http://upload-images.jianshu.io/upload_images/1689841-383f7101e6588094.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&amp;_=5479442" alt="线程状态"></p>
+<h2 id="Thread类的常用方法"><a href="#Thread类的常用方法" class="headerlink" title="Thread类的常用方法"></a>Thread类的常用方法</h2><p>Thread类构造方法：<br>1.Thread（）；<br>2.Thread（String name）；<br>3.Thread（Runable r）；<br>4.Thread（Runable r, String name）；<br>void start();//启动线程<br>boolean isAlive();//判断线程是否死亡，当线程出于就绪、运行、阻塞时返回true<br>long getId();//获得线程ID<br>String getName();//获得线程名字<br>int getPriority();//获得优先权<br>void setPriority;//设置优先权<br>boolean isDaemon();//判断是否守护线程<br>void setDaemon();//设置为守护线程<br>Thread.State getState();//获得线程状态<br>static void sleep(long mill);//休眠线程<br>void join();//等待线程结束    当某个程序执行流<br>static void yield();//放弃cpu使用权利<br>void interrupt();//中断线程<br>static Thread currentThread();//获得正在执行的线程对象</p>
+<p>对其中几个方法作出解释：<br>setPriority() 1-10或者3个静态常量（MAX_PRIORITY/10;MIN_PRIORITY/1;NORM_PRIORITY/5;)<br>setDaemon()    1.要将某个线程设置为后台线程，必须在该线程启动前设置 2.当前台线程死亡后，JVM通知后台线程死亡<br>join()    当在某个从程序执行流中调用其它线程的join()方法时，调用线程将被阻塞，指定被join()方法加入的join线程执行完为止。<br>如，在main()中调用jt线程的join()方法，那么main线程必须等jt执行结束才会向下执行。<br>sleep()    让当前正在执行的线程暂停一段时间，并进入阻塞状态。睡眠期间，该进程不会得到执行的机会。该方法抛出InterruptedException。<br>yield() 让当前正在执行的线程暂停一下，但并不进入阻塞状态，而是让系统的线程调度器重新调度一次，只有优先级与当前线程相同，或者优先级比当前线程更高的出于就绪状态的线程才会获得执行的机会。</p>
+<p> <a href="http://www.cnblogs.com/wxd0108/p/5479442.html" target="_blank" rel="external">http://www.cnblogs.com/wxd0108/p/5479442.html</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/15/Java多线程/" data-id="cjab5eebe00058o40pe4d6bcz" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/08/30/单例模式/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          单例模式
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/13/Java的I-O流/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Java的I/O流</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/11/22/Java垃圾回收机制/">Java垃圾回收机制</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/30/单例模式/">单例模式</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/15/Java多线程/">Java多线程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/13/Java的I-O流/">Java的I/O流</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/">由ListNode引发的类中定义自身类的对象……</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

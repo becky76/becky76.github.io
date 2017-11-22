@@ -3,21 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>javascript垃圾收集 | Becky</title>
+  <title>由ListNode引发的类中定义自身类的对象…… | Becky</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="首先要对内存管理概念有一个基本的认识，内存管理是指操作系统如何进行内存的分配和回收的机制。C和C++通过malloc，free函数来向操作系统请求内存和释放内存。这种机制的优点是分配内存和释放的效率很高，缺点是存在大量的内存分配和释放操作，程序员不小心忘记释放内存会造成内存泄漏。对于长期运行的软件来讲，这将是一个致命的威胁，因为系统的内存会逐渐被吃光。 
-因此，更新的编程语言，比如JAVA,C#,">
+  <meta name="description" content="‘’’class ListNode {    int val;    ListNode next;    ListNode(int x) { val = x; }}‘’’这个类中又声明一个自身类的对象。Java中可以这样。又比如最常见的：‘’’public class A(){    int yy=0;    public static void main(String[] agrs){    A">
 <meta property="og:type" content="article">
-<meta property="og:title" content="javascript垃圾收集">
-<meta property="og:url" content="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/23/javascript垃圾收集/index.html">
+<meta property="og:title" content="由ListNode引发的类中定义自身类的对象……">
+<meta property="og:url" content="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/12/由ListNode引发的类中定义自身类的对象……/index.html">
 <meta property="og:site_name" content="Becky">
-<meta property="og:description" content="首先要对内存管理概念有一个基本的认识，内存管理是指操作系统如何进行内存的分配和回收的机制。C和C++通过malloc，free函数来向操作系统请求内存和释放内存。这种机制的优点是分配内存和释放的效率很高，缺点是存在大量的内存分配和释放操作，程序员不小心忘记释放内存会造成内存泄漏。对于长期运行的软件来讲，这将是一个致命的威胁，因为系统的内存会逐渐被吃光。 
-因此，更新的编程语言，比如JAVA,C#,">
-<meta property="og:updated_time" content="2017-02-23T09:22:06.784Z">
+<meta property="og:description" content="‘’’class ListNode {    int val;    ListNode next;    ListNode(int x) { val = x; }}‘’’这个类中又声明一个自身类的对象。Java中可以这样。又比如最常见的：‘’’public class A(){    int yy=0;    public static void main(String[] agrs){    A">
+<meta property="og:updated_time" content="2017-06-12T15:19:30.808Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="javascript垃圾收集">
-<meta name="twitter:description" content="首先要对内存管理概念有一个基本的认识，内存管理是指操作系统如何进行内存的分配和回收的机制。C和C++通过malloc，free函数来向操作系统请求内存和释放内存。这种机制的优点是分配内存和释放的效率很高，缺点是存在大量的内存分配和释放操作，程序员不小心忘记释放内存会造成内存泄漏。对于长期运行的软件来讲，这将是一个致命的威胁，因为系统的内存会逐渐被吃光。 
-因此，更新的编程语言，比如JAVA,C#,">
+<meta name="twitter:title" content="由ListNode引发的类中定义自身类的对象……">
+<meta name="twitter:description" content="‘’’class ListNode {    int val;    ListNode next;    ListNode(int x) { val = x; }}‘’’这个类中又声明一个自身类的对象。Java中可以这样。又比如最常见的：‘’’public class A(){    int yy=0;    public static void main(String[] agrs){    A">
   
     <link rel="alternate" href="/atom.xml" title="Becky" type="application/atom+xml">
   
@@ -66,10 +63,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-javascript垃圾收集" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-由ListNode引发的类中定义自身类的对象……" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2017/02/23/javascript垃圾收集/" class="article-date">
-  <time datetime="2017-02-23T08:43:53.000Z" itemprop="datePublished">2017-02-23</time>
+    <a href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/" class="article-date">
+  <time datetime="2017-06-12T14:15:05.000Z" itemprop="datePublished">2017-06-12</time>
 </a>
     
   </div>
@@ -80,7 +77,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      javascript垃圾收集
+      由ListNode引发的类中定义自身类的对象……
     </h1>
   
 
@@ -88,16 +85,12 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>首先要对内存管理概念有一个基本的认识，内存管理是指操作系统如何进行内存的分配和回收的机制。C和C++通过malloc，free函数来向操作系统请求内存和释放内存。这种机制的优点是分配内存和释放的效率很高，缺点是存在大量的内存分配和释放操作，程序员不小心忘记释放内存会造成内存泄漏。对于长期运行的软件来讲，这将是一个致命的威胁，因为系统的内存会逐渐被吃光。 </p>
-<p>因此，更新的编程语言，比如JAVA,C#,都提供了所谓“垃圾回收的机制”，运行时自身会运行相应的垃圾回收机制。程序员只需要申请内存，而不需要关注内存的释放。垃圾回收器(GC)会在适当的时候将已经终止生命周期的变量的内存给释放掉。</p>
-<p>&nbsp;&nbsp;javascript具有自动垃圾收集机制，执行环境会负责管理代码执行过程中使用的内存。</p>
-<p>垃圾收集器标识无用变量的策略一般有两个：标记清除（常见）和引用计数。</p>
-<p>javascript在进行内存管理及垃圾收集时最主要的一个问题就是分配给Web浏览器的可用内存数量通常通常比分给桌面应用程序的少（目的是防止运行JavaScript的网页耗尽全部系统内存而导致系统崩溃）。优化内存占用的最佳方式就是为执行中的代码只保存必要的数据，一旦数据不再有用，最好<strong>解除引用</strong>（通过将全局变量和全局对象的属性的值设置为null来释放其引用）</p>
+        <p>‘’’<br>class ListNode {<br>    int val;<br>    ListNode next;<br>    ListNode(int x) { val = x; }<br>}<br>‘’’<br>这个类中又声明一个自身类的对象。Java中可以这样。<br>又比如最常见的：<br>‘’’<br>public class A(){<br>    int yy=0;<br>    public static void main(String[] agrs){<br>    A aa=new A();<br>    }<br>}<br>‘’’<br>由于JVM在运行Java应用程序的时候，首先会调用main方法，调用时不实例化这个类的对象，而是通过类名直接调用因此需要是限制为public static。系统寻找main的时候不关心main是否在哪个类里，所以实际上main和他的宿主在生命周期上没有关联。之所以写在这个类里只是不需要import类，图方便而已。<br>至于为什么要有main方法？类和方法的写法都是一种<strong>声明</strong>,所谓声明，只是对行为的描述，而不是真正的执行。那么程序中不能只是声明，总要调用类或方法。但这样的话，谁去调用他呢，我可以写另一类比如person类，但是谁去调用person呢？说来说去就必须有一个不需要创建对象也能调用的方法。java里面就是main方法(这个main方法只需要放到任意一个类中即可)。<br>参考： <a href="https://zhidao.baidu.com/question/538441438.html" target="_blank" rel="external">https://zhidao.baidu.com/question/538441438.html</a><br>有这样说的，<a href="http://blog.csdn.net/xijiaoda_liuhao/article/details/6823408，但我定义时实例化并没有报错。" target="_blank" rel="external">http://blog.csdn.net/xijiaoda_liuhao/article/details/6823408，但我定义时实例化并没有报错。</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/23/javascript垃圾收集/" data-id="cjab5eecl000b8o40u52rnenr" class="article-share-link">Share</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/12/由ListNode引发的类中定义自身类的对象……/" data-id="cjab5eed4000f8o40b71poab1" class="article-share-link">Share</a>
       
       
     </footer>
@@ -106,19 +99,19 @@
     
 <nav id="article-nav">
   
-    <a href="/2017/02/23/javascript引用类型/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/06/13/Java的I-O流/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          javascript引用类型
+          Java的I/O流
         
       </div>
     </a>
   
   
-    <a href="/2017/02/15/javascript实现放大镜/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2017/06/11/JVM-运行时数据区/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">javascript实现放大镜</div>
+      <div class="article-nav-title">Java异常处理</div>
     </a>
   
 </nav>

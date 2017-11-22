@@ -61,6 +61,443 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Java垃圾回收机制" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/22/Java垃圾回收机制/" class="article-date">
+  <time datetime="2017-11-22T14:11:02.000Z" itemprop="datePublished">2017-11-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/22/Java垃圾回收机制/">Java垃圾回收机制</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="什么是-Java-堆内存"><a href="#什么是-Java-堆内存" class="headerlink" title="什么是 Java 堆内存"></a>什么是 Java 堆内存</h2><p>堆是在JVM启动时创建的，主要用来维护运行时数据，如运行过程中创建的对象和数组都是基于这块内存空间。Java堆是非常重要的元素，如果我们动态创建的对象没有得到及时回收，持续堆积，最后会导致堆空间占满，内存溢出。</p>
+<p>因此，Java提供了一种垃圾回收机制，在<strong>后台创建一个守护进程</strong>。该进程会在内存紧张的时候自动跳出来，把堆空间的垃圾全部进行回收，从而保证程序的正常运行。</p>
+<h2 id="什么是垃圾"><a href="#什么是垃圾" class="headerlink" title="什么是垃圾"></a>什么是垃圾</h2><p>所谓“垃圾”，就是指所有不再存活的对象。常见的<strong>判断是否存活</strong>有两种方法：引用计数法和可达性分析。</p>
+<h3 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h3><p>为每一个创建的对象分配一个引用计数器，用来存储该对象被引用的个数。当该个数为零，意味着没有人再使用这个对象，可以认为“对象死亡”。但是，这种方案存在严重的问题，就是无法检测“循环引用”：当两个对象互相引用，即时它俩都不被外界任何东西引用，它俩的计数都不为零，因此永远不会被回收。而实际上对于开发者而言，这两个对象已经完全没有用处了。</p>
+<h3 id="可达性分析"><a href="#可达性分析" class="headerlink" title="可达性分析"></a>可达性分析</h3><p>这种方案是目前主流语言里采用的对象存活性判断方案。基本思路是把所有引用的对象想象成一棵树，从树的根结点 GC Roots 出发，持续遍历找出所有连接的树枝对象，这些对象则被称为“可达”对象，或称“存活”对象。其余的对象则被视为“死亡”的“不可达”对象，或称“垃圾”。<br> <img src="http://incdn1.b0.upaiyun.com/2017/10/de3b5b129b7c7dd9659ef0cc899b8732.jpg" alt="image"></p>
+<h2 id="回收垃圾的方式"><a href="#回收垃圾的方式" class="headerlink" title="回收垃圾的方式"></a>回收垃圾的方式</h2><p>上面已经知道，所有 GC Roots 不可达的对象都称为垃圾，参考下图，黑色的表示垃圾，灰色表示存活对象，绿色表示空白空间。<br><img src="http://incdn1.b0.upaiyun.com/2017/10/c8087da0f5a4a03f894d06af19b465f7.png" alt="image"></p>
+<h3 id="标记-清理"><a href="#标记-清理" class="headerlink" title="标记-清理"></a>标记-清理</h3><p>第一步，所谓“标记”就是利用可达性遍历堆内存，把“存活”对象和“垃圾”对象进行标记，得到的结果如上图；<br>第二步，既然“垃圾”已经标记好了，那我们再遍历一遍，把所有“垃圾”对象所占的空间直接 清空 即可。</p>
+<p>结果如下：<br><img src="http://incdn1.b0.upaiyun.com/2017/10/2ea8dc60e289787d76ba38239b6604e0.png" alt="image"><br>这便是 标记－清理 方案，简单方便 ，但是容易产生 内存碎片。</p>
+<h3 id="标记-整理"><a href="#标记-整理" class="headerlink" title="标记-整理"></a>标记-整理</h3><p>既然上面的方法会产生内存碎片，那好，我在清理的时候，把所有 存活对象扎堆到同一个地方，让它们待在一起，这样就没有内存碎片了。</p>
+<p>结果如下：<br><img src="http://incdn1.b0.upaiyun.com/2017/10/a4ae0fc76b676e9ab41f7a0a87fb6072.png" alt="image"></p>
+<p>这两种方案适合 存活对象多，垃圾少 的情况，它只需要清理掉少量的垃圾，然后挪动下存活对象就可以了。</p>
+<h3 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h3><p>这种方法比较粗暴，直接把堆内存分成两部分，一段时间内只允许在其中一块内存上进行分配，当这块内存被分配完后，则执行垃圾回收，把所有 存活 对象全部复制到另一块内存上，当前内存则直接全部清空。<br>参考下图：<br><img src="http://incdn1.b0.upaiyun.com/2017/10/c3632abfa4c296cb613da3c5554cbf00.png" alt="image"></p>
+<p>起初时只使用上面部分的内存，直到内存使用完毕，才进行垃圾回收，把所有存活对象搬到下半部分，并把上半部分进行清空。</p>
+<p>这种做法不容易产生碎片，也简单粗暴；但是，它意味着你在一段时间内只能使用一部分的内存，超过这部分内存的话就意味着堆内存里频繁的 复制清空。</p>
+<p>这种方案适合 存活对象少，垃圾多 的情况，这样在复制时就不需要复制多少对象过去，多数垃圾直接被清空处理。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/11/22/Java垃圾回收机制/" data-id="cjab5eeb100038o4016dyk6ki" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-单例模式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/08/30/单例模式/" class="article-date">
+  <time datetime="2017-08-30T10:22:36.000Z" itemprop="datePublished">2017-08-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/30/单例模式/">单例模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>单例模式singleton<br>保证一个类只有一个实例，并提供一个访问它的全局访问点<br>关键：将构造方法私有化，不允许外部直接创建对象</p>
+<p>饿汉模式:加载类时比较慢，但运行时获取对象的速度比较快<br>public class Singleton{<br>    //1.将构造方法私有化，不允许外部直接创建对象<br>    private Singleton(){}<br>    //2.创建类的唯一实例，使用private static修饰<br>    private static Singleton instance = new Singleton();<br>    //3.提供一个用于获取实例的方法，使用public static修饰<br>    public static Singleton getInstance(){<br>        return instance;<br>    }<br>}</p>
+<p>懒汉模式：加载类时比较快，但运行时获取对象的速度比较慢<br>public class Singleton2{<br>    //1.将构造方法私有化，不允许外部直接创建对象<br>    private Singleton2(){}<br>    //2.声明类的唯一实例，使用private static修饰<br>    private static Singleton2 instance;<br>    //3.提供一个用于获取实例的方法，使用public static修饰<br>    public static Singleton2 getInstance(){<br>        if(instance==null){<br>            instance=new Singleton2();<br>        }<br>        return instance;<br>    }<br>}</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/08/30/单例模式/" data-id="cjab5eed9000g8o408sakcu40" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java多线程" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/15/Java多线程/" class="article-date">
+  <time datetime="2017-06-15T01:28:24.000Z" itemprop="datePublished">2017-06-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/15/Java多线程/">Java多线程</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>几乎所有的操作系统都支持同时运行多个任务，所有运行中的任务通常对应一个进程。进程是处于运行过程中的程序，是系统进行资源分配和调度的一个独立单位。<br>当一个程序运行时，内部可能包含了多个顺序执行流，每个顺序执行流就是一个线程。<br>不是所有的多线程代码都可以用单线程来实现，比如生产者-消费者模型。</p>
+<ul>
+<li>并行：多个cpu实例或者多台机器同时执行一段处理逻辑，是真正的同时。</li>
+<li>并发：在同一时间间隔内发生。通过cpu调度算法，让用户看上去同时执行，实际上从cpu操作层面不是真正的同时。</li>
+</ul>
+<h2 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h2><ol>
+<li><strong>继承Thread类</strong><br>（1）定义Thread类的子类，并重写该类的run方法，该run方法的方法体就代表了线程要完成的任务。因此把run()方法称为执行体。<br>（2）创建Thread子类的实例，即创建了线程对象。<br>（3）调用线程对象的start()方法来启动该线程。<br>‘’’<br>public class FirstThreadTest extends Thread{<br> int i = 0;<br> //重写run方法，run方法的方法体就是线程执行体<br> public void run()<br> {  <pre><code>for(;i&lt;100;i++){  
+System.out.println(getName()+&quot;  &quot;+i);           
+}  
+</code></pre> }<br> public static void main(String[] args)<br> {  <pre><code>for(int i = 0;i&lt; 100;i++)  
+{                      System.out.println(Thread.currentThread().getName()+&quot;  : &quot;+i);  
+    if(i==20)  
+    {  
+        new FirstThreadTest().start();  
+        new FirstThreadTest().start();  
+    }  
+}  
+</code></pre> }  </li>
+</ol>
+<p>}<br>‘’’<br>该程序有三个线程，除了显式创建并启动的2个线程，还有1个Java运行时默认的主线程。主线程的线程执行体是main()方法的方法体。<br>当线程类继承Thread类时，直接使用this即可获取当前线程。<br>Thread.currentThread()：currentThread()方法是Thread类的静态方法，返回当前正在执行的线程对象<br>getName():是Thread类的实例方法，返回调用该方法的线程名字</p>
+<ol>
+<li><p><strong>实现Runnable接口</strong><br>（1）定义runnable接口的实现类，并重写该接口的run()方法，该run()方法的方法体同样是该线程的线程执行体。<br>（2）创建Runnable实现类的实例，并以此实例作为Thread的target来创建Thread对象，该Thread对象才是真正的线程对象。<br>（3）调用线程对象的start()方法来启动该线程<br>‘’’<br>public class RunnableThreadTest implements Runnable<br>{<br> private int i;<br> public void run()<br> {  </p>
+<pre><code>for(i = 0;i &lt;100;i++)  
+{  
+    System.out.println(Thread.currentThread().getName()+&quot; &quot;+i);  
+}  
+</code></pre><p> }<br> public static void main(String[] args)<br> {  </p>
+<pre><code>for(int i = 0;i &lt; 100;i++)  
+{  
+    System.out.println(Thread.currentThread().getName()+&quot; &quot;+i);  
+    if(i==20)  
+    {  
+        RunnableThreadTest rtt = new RunnableThreadTest();  
+        new Thread(rtt,&quot;新线程1&quot;).start();  
+        new Thread(rtt,&quot;新线程2&quot;).start();  
+    }  
+}    
+</code></pre><p> }<br>}<br>‘’’</p>
+</li>
+<li><p><strong>使用Callable和Future</strong><br>（1）创建Callable接口的实现类，并实现call()方法，该call()方法将作为线程执行体，并且有返回值。<br>（2）创建Callable实现类的实例，使用FutureTask类来包装Callable对象，该FutureTask对象封装了该Callable对象的call()方法的返回值。<br>（3）使用FutureTask对象作为Thread对象的target创建并启动新线程。<br>（4）调用FutureTask对象的get()方法来获得子线程执行结束后的返回值<br>call()比run()方法功能强大，call()可以有返回值，也可以声明抛出异常<br>‘’’<br>import java.util.concurrent.Callable;<br>import java.util.concurrent.ExecutionException;<br>import java.util.concurrent.FutureTask;  </p>
+</li>
+</ol>
+<p>public class CallableThreadTest implements Callable<integer><br>{<br>    //实现call(),作为线程执行体<br>    @Override<br>    public Integer call() throws Exception<br>    {<br>        int i = 0;<br>        for(;i&lt;100;i++)<br>        {<br>            System.out.println(Thread.currentThread().getName()+” “+i);<br>        }<br>        return i;<br>    }  </integer></p>
+<pre><code>public static void main(String[] args)  
+{  
+    CallableThreadTest ctt = new CallableThreadTest();  
+    FutureTask&lt;Integer&gt; ft = new FutureTask&lt;&gt;(ctt);  
+    for(int i = 0;i &lt; 100;i++)  
+    {                              
+        System.out.println(Thread.currentThread().getName()+&quot; 的循环变量i的值&quot;+i);  
+        if(i==20)  
+        {  
+            new Thread(ft,&quot;有返回值的线程&quot;).start();  
+        }  
+    }  
+    try  
+    {  
+        System.out.println(&quot;子线程的返回值：&quot;+ft.get());  
+    } catch (InterruptedException e)  
+    {  
+        e.printStackTrace();  
+    } catch (ExecutionException e)  
+    {  
+        e.printStackTrace();  
+    }    
+}   
+</code></pre><p>}  </p>
+<h3 id="创建线程的三种方式的对比"><a href="#创建线程的三种方式的对比" class="headerlink" title="创建线程的三种方式的对比"></a>创建线程的三种方式的对比</h3><p>采用实现Runnable、Callable接口的方式创见多线程时，</p>
+<ul>
+<li>优势是：线程类只是实现了Runnable接口或Callable接口，还可以继承其他类。在这种方式下，多个线程可以共享同一个target对象，所以非常适合多个相同线程来处理同一份资源的情况，从而可以将CPU、代码和数据分开，形成清晰的模型，较好地体现了面向对象的思想。</li>
+<li>劣势是：编程稍微复杂，如果要访问当前线程，则必须使用Thread.currentThread()方法。</li>
+</ul>
+<p>使用继承Thread类的方式创建多线程时</p>
+<ul>
+<li>优势是：编写简单，如果需要访问当前线程，则无需使用Thread.currentThread()方法，直接使用this即可获得当前线程。</li>
+<li>劣势是：线程类已经继承了Thread类，所以不能再继承其他父类。</li>
+</ul>
+<h2 id="线程状态"><a href="#线程状态" class="headerlink" title="线程状态"></a>线程状态</h2><p><img src="http://upload-images.jianshu.io/upload_images/1689841-383f7101e6588094.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&amp;_=5479442" alt="线程状态"></p>
+<h2 id="Thread类的常用方法"><a href="#Thread类的常用方法" class="headerlink" title="Thread类的常用方法"></a>Thread类的常用方法</h2><p>Thread类构造方法：<br>1.Thread（）；<br>2.Thread（String name）；<br>3.Thread（Runable r）；<br>4.Thread（Runable r, String name）；<br>void start();//启动线程<br>boolean isAlive();//判断线程是否死亡，当线程出于就绪、运行、阻塞时返回true<br>long getId();//获得线程ID<br>String getName();//获得线程名字<br>int getPriority();//获得优先权<br>void setPriority;//设置优先权<br>boolean isDaemon();//判断是否守护线程<br>void setDaemon();//设置为守护线程<br>Thread.State getState();//获得线程状态<br>static void sleep(long mill);//休眠线程<br>void join();//等待线程结束    当某个程序执行流<br>static void yield();//放弃cpu使用权利<br>void interrupt();//中断线程<br>static Thread currentThread();//获得正在执行的线程对象</p>
+<p>对其中几个方法作出解释：<br>setPriority() 1-10或者3个静态常量（MAX_PRIORITY/10;MIN_PRIORITY/1;NORM_PRIORITY/5;)<br>setDaemon()    1.要将某个线程设置为后台线程，必须在该线程启动前设置 2.当前台线程死亡后，JVM通知后台线程死亡<br>join()    当在某个从程序执行流中调用其它线程的join()方法时，调用线程将被阻塞，指定被join()方法加入的join线程执行完为止。<br>如，在main()中调用jt线程的join()方法，那么main线程必须等jt执行结束才会向下执行。<br>sleep()    让当前正在执行的线程暂停一段时间，并进入阻塞状态。睡眠期间，该进程不会得到执行的机会。该方法抛出InterruptedException。<br>yield() 让当前正在执行的线程暂停一下，但并不进入阻塞状态，而是让系统的线程调度器重新调度一次，只有优先级与当前线程相同，或者优先级比当前线程更高的出于就绪状态的线程才会获得执行的机会。</p>
+<p> <a href="http://www.cnblogs.com/wxd0108/p/5479442.html" target="_blank" rel="external">http://www.cnblogs.com/wxd0108/p/5479442.html</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/15/Java多线程/" data-id="cjab5eebe00058o40pe4d6bcz" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java的I-O流" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/13/Java的I-O流/" class="article-date">
+  <time datetime="2017-06-13T06:50:18.000Z" itemprop="datePublished">2017-06-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/13/Java的I-O流/">Java的I/O流</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Java的IO通过java.io包下的类和接口来支持，在java.io包下主要不包括输入、输出两种IO流，每种输入、输出流又可分为字节流和字符流两大类。除此之外，Java的IO流使用了一种装饰器设计模式，它将IO流分成底层节点流和上层处理流，其中节点流用于和底层的物理存储节点直接关联——不同的物理节点流获取节点流的方式可能存在一定的差异，但程序可以把不同的物理节点流包装成统一的处理流，从而允许程序使用统一的输入、输出代码来读取不同的物理存储节点的资源。</p>
+<h2 id="File类"><a href="#File类" class="headerlink" title="File类"></a>File类</h2><p>File类是java.io包下代表与平台无关的文件和目录。不管是文件还是目录都是使用File来操作的，<strong>File能新建、删除、重命名文件和目录，但不能访问文件内容本身。如果需要访问文件内容本身，则需要使用输入/输出流</strong>。</p>
+<ol>
+<li>###访问文件名相关的方法<br> <strong>String getName():返回此File对象的文件名。</strong><br> <strong>String getPath():返回此File对象所对应的路径名。</strong><br> String getAbsolutePath():返回此File对象所对应的绝对路径名。<br> boolean renameTo(File newName):重命名此File对象所对应的文件或目录。成功后返回true。<br> 文件检测相关的方法<br> <strong>boolean exists()</strong><br> boolean canWrite/canRead()<br> <strong>boolean isFile()</strong><br> <strong>boolean isDirectory()</strong><br> 获取常规文件信息<br> long lastModeified()<br> long length():返回文件内容的长度。<br> 文件操作相关的方法<br> <strong>boolean createNewFile():当此File对象所对应的文件不存在时，该方法将新建一个该File对象所所指定的新文件。创建成功则返回true。</strong><br> boolean delete()<br> 目录操作相关的方法<br> <strong>boolean mkdir():创建一个File对象所对应的目录，如果创建成功返回true。调用该方法时File对象必须对应一个路径，而不是文件。</strong><br> String[] list():列出File对象的所有子文件名和路径名，返回String数组。<br> File[] listFiles():列出File对象的所有子文件和路径，返回File数组。<br>tip:Java中的反斜线表示转义字符，在Windows的路径下应使用两条反斜线。如：D:\Java\test.txt。</li>
+</ol>
+<h2 id="理解Java的I-O流"><a href="#理解Java的I-O流" class="headerlink" title="理解Java的I/O流"></a>理解Java的I/O流</h2><p>标准输入输出，文件的操作，网络上的数据流，字符串流，对象流，zip文件流等等，java中将输入输出抽象称为流，就好像水管，将两个容器连接起来。将数据冲外存中读取到内存中的称为输入流，将数据从内存写入外存中的称为输出流。 流是一个很形象的概念，当程序需要读取数据的时候，就会开启一个通向数据源的流，这个数据源可以是文件，内存，或是网络连接。类似的，当程序需要写入数据的时候，就会开启一个通向目的地的流。<br>详情：<a href="http://blog.csdn.net/hguisu/article/details/7418161" target="_blank" rel="external">http://blog.csdn.net/hguisu/article/details/7418161</a></p>
+<h2 id="字节流和字符流"><a href="#字节流和字符流" class="headerlink" title="字节流和字符流"></a>字节流和字符流</h2><p><strong>字节流主要由InputStream和OutputStream作为基类，字符流主要由Reader和Writer作为基类。他们都是一些抽象基类，无法直接创建实例。Java的IO流的四十多个类都是由这四个抽象基类派生的。</strong><br>  <strong>InputStream</strong><br>  int read():从输入流中读取单个字节，返回所读取的字节数据。<br>  int read(byte[] b):从输入流中最多读取b.length该字节的数据，并将其存储在字节数组b中，返回实际读取的字节数。<br>  int read(byte[] b,int off,int len):从输入流中最多读取b.length该字节的数据，并将其存储在字节数组b中，但不是从数组b的起点开始，而是从off位置开始，返回实际读取的字节数。<br>  <strong>Reader</strong><br>  int read()<br>  int read(char[] cbuf)<br>  int read(char[] cbuf,int off,int len)<br>  直到read(byte[] b)或read（char[] cbuf)方法返回-1，表明到了输入流的结束点。<br>  InputStream和Reader不能创建实例，但它们分别有一个用于读取文件的输入流FileInputStream和FileReader。<br>  ‘’’<br>  public class FileInputStreamTest{<br>    public static void main(String[] args) throws IOException{<br>        FileInputStream fis = new FileInputStream(“FileInputStreamTest.java”); //创建字节输入流<br>        byte[] bbuf = new byte[1024];<br>        int hasRead = 0; //用于保存实际读取的字节数<br>        while((hasRead = fis.read(bbuf) &gt; 0 ){<br>            System.out.print(new String(bbuf , 0 , hasRead));    //将字节数组转换成字符串输入<br>        }<br>        fis.close();    //关闭文件输入流<br>    }<br>  }<br>  ‘’’<br>  tip:程序里打开的文件IO资源不属于内存里的资源，垃圾回收机制无法回收该资源，所以应该显式关闭文件IO资源。<br>  <strong>OutputStream和Writer</strong><br>  int write(int c):将指定的字节/字符输出到输出流。c可以是字节也可以是字符。<br>  int write(byte[]/char[] buf):将指定的字节/字符输出到指定输出流中。<br>  int write(byte[]/char[] buf,int off,int len):将字节数组/字符数组中从off位置开始，长度为len的字节/字符输出到输出流中。<br>  Writer里还包含以下两个方法：void write(String str)和void write(Stirng str,int off,int len)<br>  ‘’’<br>  public class FileOutputStreamTest{<br>    public static void main(String[] args) throws IOException{<br>        try(    //Java7改写了所有的IO资源类，它们都实现了AutoCloseable接口，因此都可通过自动关闭资源的try语句来关闭这些IO流。<br>            FileInputStream fis = new FileInputStream(“FileOutputStreamTest.java”); //创建字节输入流<br>            FileOutputStream fos = new FileOutputStream(“newFile.txt”); //创建字节输出流<br>        )<br>        {<br>            byte[] bbuf = new byte[32];<br>            int hasRead = 0; //用于保存实际读取的字节数<br>            while((hasRead = fis.read(bbuf) &gt; 0 ){<br>                fos.write(bbuf,0,hasRead);    //每读取一次就写入文件输出流<br>            }<br>        }<br>        catch(IOException ioe)<br>        {<br>            ioe.printStackTrace();<br>        }<br>    }<br>  }<br>  ‘’’</p>
+<h2 id="输入-输出流体系"><a href="#输入-输出流体系" class="headerlink" title="输入/输出流体系"></a>输入/输出流体系</h2><ol>
+<li><h3 id="处理流"><a href="#处理流" class="headerlink" title="处理流"></a>处理流</h3><p>上一节介绍了4个<strong>访问文件的节点流</strong>的用法，接下来介绍处理流。<br>使用处理流时的思路是，使用处理流来包装节点流，程序通过处理流来执行输入/输出功能，让节点流与底层的I/O设备、文件交互。<br>下面使用PrintStream处理流来包装OutputStream，使用处理流后的输出流在输出时更加方便。<br> ‘’’<br> public class PrintStreamTest<br> {</p>
+<pre><code>public static void main(Stirng[] args)
+{
+    try(
+        FileOutputStream fos = new FileOutputStream(&quot;test.txt&quot;);
+        PrintStream ps = new PrintStream(fos);)
+    {
+        ps.println(&quot;aaabbbb&quot;);
+        ps.println(new PrintStreamTest());
+    }
+    catch(IOException ioe)
+    {
+        ioe.printStackTrace();
+    }
+}
+</code></pre><p> }<br> ‘’’<br> <strong>System.out的类型就是PrintStream</strong></p>
+</li>
+<li><h3 id="转换流"><a href="#转换流" class="headerlink" title="转换流"></a>转换流</h3><p><strong>InputStreamReader将字节输入流转换成字符输入流，OutputStreamWriter将字节输出流转换成字符输出流。</strong></p>
+</li>
+</ol>
+<h2 id="重定向标准输入-输出"><a href="#重定向标准输入-输出" class="headerlink" title="重定向标准输入/输出"></a>重定向标准输入/输出</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/13/Java的I-O流/" data-id="cjab5eecj000a8o400gnh6tff" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-由ListNode引发的类中定义自身类的对象……" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/" class="article-date">
+  <time datetime="2017-06-12T14:15:05.000Z" itemprop="datePublished">2017-06-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/">由ListNode引发的类中定义自身类的对象……</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>‘’’<br>class ListNode {<br>    int val;<br>    ListNode next;<br>    ListNode(int x) { val = x; }<br>}<br>‘’’<br>这个类中又声明一个自身类的对象。Java中可以这样。<br>又比如最常见的：<br>‘’’<br>public class A(){<br>    int yy=0;<br>    public static void main(String[] agrs){<br>    A aa=new A();<br>    }<br>}<br>‘’’<br>由于JVM在运行Java应用程序的时候，首先会调用main方法，调用时不实例化这个类的对象，而是通过类名直接调用因此需要是限制为public static。系统寻找main的时候不关心main是否在哪个类里，所以实际上main和他的宿主在生命周期上没有关联。之所以写在这个类里只是不需要import类，图方便而已。<br>至于为什么要有main方法？类和方法的写法都是一种<strong>声明</strong>,所谓声明，只是对行为的描述，而不是真正的执行。那么程序中不能只是声明，总要调用类或方法。但这样的话，谁去调用他呢，我可以写另一类比如person类，但是谁去调用person呢？说来说去就必须有一个不需要创建对象也能调用的方法。java里面就是main方法(这个main方法只需要放到任意一个类中即可)。<br>参考： <a href="https://zhidao.baidu.com/question/538441438.html" target="_blank" rel="external">https://zhidao.baidu.com/question/538441438.html</a><br>有这样说的，<a href="http://blog.csdn.net/xijiaoda_liuhao/article/details/6823408，但我定义时实例化并没有报错。" target="_blank" rel="external">http://blog.csdn.net/xijiaoda_liuhao/article/details/6823408，但我定义时实例化并没有报错。</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/12/由ListNode引发的类中定义自身类的对象……/" data-id="cjab5eed4000f8o40b71poab1" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-JVM-运行时数据区" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/11/JVM-运行时数据区/" class="article-date">
+  <time datetime="2017-06-11T08:26:53.000Z" itemprop="datePublished">2017-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/11/JVM-运行时数据区/">Java异常处理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="JVM的内存区域划分"><a href="#JVM的内存区域划分" class="headerlink" title="JVM的内存区域划分"></a>JVM的内存区域划分</h3><p>运行时数据区：Java源代码（.java）被Java编译器编译为字节码文件（.class），然后有JVM中的类加载器加载各个类的字节码文件，加载完毕之后，交给JVM执行引擎执行。在整个程序执行过程中，JVM会有一段空间来存储程序执行期间需要用到的数据和相关信息，这段空间一般被称为Runtime Data Area(运行时数据区),也就是我们常说的JVM内存。</p>
+<h3 id="运行时数据区包括哪几部份"><a href="#运行时数据区包括哪几部份" class="headerlink" title="运行时数据区包括哪几部份"></a>运行时数据区包括哪几部份</h3><p>根据《Java虚拟机规范》的规定，运行时数据区通常包括这几个部分：程序计数器(Program Counter Register)、Java栈(VM Stack)、本地方法栈(Native Method Stack)、方法区(Method Area)、堆(Heap)。</p>
+<h3 id="运行时数据区的每部分到底存储了哪些数据？"><a href="#运行时数据区的每部分到底存储了哪些数据？" class="headerlink" title="运行时数据区的每部分到底存储了哪些数据？"></a>运行时数据区的每部分到底存储了哪些数据？</h3><h3 id="Java栈"><a href="#Java栈" class="headerlink" title="Java栈"></a>Java栈</h3><p>　　Java栈也称作虚拟机栈（Java Vitual Machine Stack），也就是我们常常所说的栈，跟C语言的数据段中的栈类似。<br>Java栈中存放的是一个个的栈帧，每个栈帧对应一个被调用的方法，在栈帧中包括局部变量表(Local Variables)、操作数栈(Operand Stack)、指向当前方法所属的类的运行时常量池（运行时常量池的概念在方法区部分会谈到）的引用(Reference to runtime constant pool)、方法返回地址(Return Address)和一些额外的附加信息。当线程执行一个方法时，就会随之创建一个对应的栈帧，并将建立的栈帧压栈。当方法执行完毕之后，便会将栈帧出栈。因此可知，线程当前执行的方法所对应的栈帧必定位于Java栈的顶部。讲到这里，大家就应该会明白为什么 在 使用 递归方法的时候容易导致栈内存溢出的现象了以及为什么栈区的空间不用程序员去管理了（当然在Java中，程序员基本不用关系到内存分配和释放的事情，因为Java有自己的垃圾回收机制），这部分空间的分配和释放都是由系统自动实施的。对于所有的程序设计语言来说，栈这部分空间对程序员来说是不透明的。<br>　<strong>局部变量表</strong>，顾名思义，就是用来存储方法中的局部变量（包括在方法中声明的非静态变量以及函数形参）。对于基本数据类型的变量，则直接存储它的值，对于引用类型的变量，则存的是指向对象的引用。局部变量表的大小在编译器就可以确定其大小了，因此在程序执行期间局部变量表的大小是不会改变的。<br>　　<strong>操作数栈</strong>，想必学过数据结构中的栈的朋友想必对表达式求值问题不会陌生，栈最典型的一个应用就是用来对表达式求值。想想一个线程执行方法的过程中，实际上就是不断执行语句的过程，而归根到底就是进行计算的过程。因此可以这么说，程序中的所有计算过程都是在借助于操作数栈来完成的。<br>　　<strong>指向运行时常量池的引用</strong>，因为在方法执行的过程中有可能需要用到类中的常量，所以必须要有一个引用指向运行时常量。<br>　　<strong>方法返回地址</strong>，当一个方法执行完毕之后，要返回之前调用它的地方，因此在栈帧中必须保存一个方法返回地址。<br>　　由于每个线程正在执行的方法可能不同，因此每个线程都会有一个自己的Java栈，互不干扰。</p>
+<h3 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h3><p>　　Java中的堆是用来存储<strong>对象本身的以及数组</strong>（当然，数组引用是存放在Java栈中的）。只不过和C语言中的不同，在Java中，程序员基本不用去关心空间释放的问题，Java的垃圾回收机制会自动进行处理。因此这部分空间也是Java垃圾收集器管理的主要区域。另外，堆是被所有线程共享的，在JVM中只有一个堆。</p>
+<p>###方法区<br>　　方法区与堆一样，是被线程共享的区域。在方法区中，存储了<strong>每个类的信息（包括类的名称、方法信息、字段信息）、静态变量、常量以及编译器编译后的代码</strong>等。<br>　　在Class文件中除了类的字段、方法、接口等描述信息外，还有一项信息是常量池，用来存储编译期间生成的字面量和符号引用。<br>　　在方法区中有一个非常重要的部分就是运行时<strong>常量池</strong>，它是每一个类或接口的常量池的运行时表示形式，在类和接口被加载到JVM后，对应的运行时常量池就被创建出来。当然并非Class文件常量池中的内容才能进入运行时常量池，在运行期间也可将新的常量放入运行时常量池中，比如String的intern方法。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/11/JVM-运行时数据区/" data-id="cjab5eea800008o40uk8mw5hx" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java异常处理" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/11/Java异常处理/" class="article-date">
+  <time datetime="2017-06-11T08:26:53.000Z" itemprop="datePublished">2017-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/11/Java异常处理/">Java异常处理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="使用try…catch捕获异常"><a href="#使用try…catch捕获异常" class="headerlink" title="使用try…catch捕获异常"></a>使用try…catch捕获异常</h3><p>try块中定义业务实现代码，catch块中是对错误处理的代码。<br>‘’’<br>try<br>{<br>    //业务实现代码<br>    …<br>}<br>catch(ExceptionClass1 e1)<br>{<br>    //错误处理代码<br>}<br>catch(ExceptionClass2 e2)<br>{<br>    //错误处理代码<br>}<br>‘’’<br>如果执行try块里的业务逻辑代码时出现异常，系统自动生成一个异常对象，该异常对象被提交给Java运行时环境，这个过程被称为<strong>抛出</strong>(throw)异常。<br>当Java运行时环境收到该异常对象时，会寻找能处理该异常对象的catch块，如果找到合适的catch块，则把该异常对象交给该catch块处理，这个过程被称为<strong>捕获</strong>(catch)异常。<br>如果Java运行时环境找不到捕获异常的catch块，则运行时环境终止，Java程序也将退出。</p>
+<h3 id="异常类的继承体系"><a href="#异常类的继承体系" class="headerlink" title="异常类的继承体系"></a>异常类的继承体系</h3><p>从catch(Exception e)可看出，每个catch块都是专门用于<strong>处理该异常类及其子类的异常实例</strong>。当Java运行时环境收到异常对象后，会依次判断该异常对象是否是catch块后异常类及其子类的实例，如果是，Java运行时环境将调用catch块来处理该异常；否则再次和下一个catch块内的异常类进行比较。<strong>当程序进入负责处理异常的catch块时，系统生成的异常对象ex将会传给catch块后的异常形参，从而允许catch块通过该对象来获得异常的详细信息</strong>。<br>所有的异常对象都包含如下常用方法。<br>getMessage():返回该异常的详细描述字符串。<br>printStackTrace():将该异常的跟踪栈信息输出到标准错误输出。<br>printStackTrace(PrintStream s):将该异常的跟踪栈信息输出到指定输出流。<br>getStackTrace():返回该异常的跟踪栈信息。<br>![Java常见的异常类之间的继承关系]（<a href="http://img.my.csdn.net/uploads/201211/27/1354020417_5176.jpg）" target="_blank" rel="external">http://img.my.csdn.net/uploads/201211/27/1354020417_5176.jpg）</a><br>进行异常捕获时，一定要先捕获小异常，再捕获大异常。</p>
+<h3 id="Java7提供了多异常捕获"><a href="#Java7提供了多异常捕获" class="headerlink" title="Java7提供了多异常捕获"></a>Java7提供了多异常捕获</h3><p>使用一个catch块捕获多种类型的异常时，多种异常类型用竖线(|)分割开且异常变量不能重新赋值。</p>
+<h3 id="使用finally回收资源。"><a href="#使用finally回收资源。" class="headerlink" title="使用finally回收资源。"></a>使用finally回收资源。</h3><p>程序在try块里打开的物理资源（如数据库连接、网络连接、磁盘文件）必须显式回收。finally块总会被执行，除非在块、catch总调用了退出虚拟机的方法System.exit(1)。</p>
+<h3 id="Java的自动关闭资源的try语句"><a href="#Java的自动关闭资源的try语句" class="headerlink" title="Java的自动关闭资源的try语句"></a>Java的自动关闭资源的try语句</h3><p>在try关键字后紧跟一对圆括号，圆括号可以声明、初始化一个或多个资源，此处的资源指的是那些必须在程序结束时显示关闭的资源，try语句在该语句结束时自动关闭这些资源。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/11/Java异常处理/" data-id="cjab5eebm00068o401isrbbn2" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Java泛型" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/11/Java泛型/" class="article-date">
+  <time datetime="2017-06-11T01:22:51.000Z" itemprop="datePublished">2017-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/11/Java泛型/">Java泛型</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h2><p>在没有泛型之前，一旦把一个对象“丢进”Java集合中，集合就会忘记对象的类型，把所有的对象当成Object类型处理（如果想创建一个只能保存String类型的集合，但程序可以将int类型丢进）。当程序从集合中取出对象后，就需要进行强制类型转换，可能引发ClassCastException异常（将对象强制转化成String类型，此时编译阶段正常,但运行时int类型的对象将引发异常）。示例如下：<br>‘’’<br>public class GenericTest {<br>    public static void main(String[] args) {<br>        List list = new ArrayList();<br>        list.add(“chocolate”);<br>        list.add(“ice cream”);<br>        list.add(10);</p>
+<pre><code>    for (int i = 0; i &lt; list.size(); i++) {
+        String snacks = (String) list.get(i); 
+        System.out.println(&quot;snacks:&quot; + name);
+    }
+}
+</code></pre><p>}<br>‘’’<br>从Java5以后，Java引入了“参数化类型”，运行我们在创建集合时指定集合元素的类型，如List<string>，这表明该List只能保存字符串类型的对象。Java的参数化类型被称为泛型（Generic）。<br><strong>所谓泛型，就是允许在定义类、接口、方法时使用类型形参，这个类型形参将在声明变量、创建对象、调用方法时动态地指定（即传入实际的类型参数，即类型实参）</strong>。<br>在List<string>中，String是类型实参，那么相应的List接口中肯定含有类型形参。<br>public interface List<e><br>{<br>    //下面方法可以使用E作为参数类型,类型形参在整个类体内可当成类型使用。<br>    void add(E x);<br>    Iterator<e> iterator();<br>}<br>例如我们使用List类型时，为E形参传入了String类型实参，则产生了List<string>类型，我们可以把它想象成E全部替换成String的特殊List子接口。因此，虽然程序只定义了一个List<e>接口，但实际使用时可以产生无数多个List接口。</e></string></e></e></string></string></p>
+<h3 id="自定义泛型接口、泛型类和泛型方法"><a href="#自定义泛型接口、泛型类和泛型方法" class="headerlink" title="自定义泛型接口、泛型类和泛型方法"></a>自定义泛型接口、泛型类和泛型方法</h3><p>‘’’<br>public class Apple<t> //定义Apple类时使用了泛型声明<br>{<br>    private T info;  //使用T类型形参定义实例变量<br>    //下面方法中使用T类型形成残来定义构造器<br>    public Apple(){}<br>    public Apple(T info)<br>    {<br>        this.info = info;<br>    }<br>    public T getInfo()<br>    {<br>        return this.info;<br>    }<br>    public static void main(String[] args)<br>    {<br>        Apple<string> a1 = new Apple&lt;&gt;(“苹果”);<br>        System.out.println(a1.getInfo());<br>    }<br>}<br>‘’’<br>创建带泛型声明的自定义类，为该类定义构造器时，构造器名还是原来的类名，不要增加泛型声明。如为Apple<t>类定义构造器，其构造器类名仍然是Apple，而不是Apple<t>。调用该构造器时，可以使用Apple<t>（需传入类型实参），也可以省略&lt;&gt;中的类型实参。<br>虽然可以传入不容的类型实参，从而动态地生成无数多个逻辑上的子类，但这种子类逻辑上不存在。Apple<string>和Apple<integer>是同一个类，内存中也只占用一块内存空间。</integer></string></t></t></t></string></t></p>
+<h3 id="从泛型类派生子类"><a href="#从泛型类派生子类" class="headerlink" title="从泛型类派生子类"></a>从泛型类派生子类</h3><p>当使用带泛型声明的接口、父类时不能再包含类型形参。如<br>‘’’<br>public class A extends Apple<t>{}<br>‘’’<br>这是错的。<br>‘’’<br>public class A extends Apple<string>{}<br>‘’’<br>是正确的。但也可以不为类型形参传输实际的类型参数。即下面代码也是正确的<br>‘’’<br>public class A extends Apple<br>‘’’<br>但是Java编译器可能发出警告：使用了未经检查或不安全的操作。</string></t></p>
+<h3 id="类型通配符"><a href="#类型通配符" class="headerlink" title="类型通配符"></a>类型通配符</h3><p>‘’’<br>public void test(List<object> c)<br>{<br>    for(int i = 0; i &lt; c.size(); i++)<br>    {<br>        System.out.println(c.get(i));<br>    }<br>}<br>‘’’<br>这个方法声明没有问题，但调用该方法时，编译错误<br>‘’’<br>List<string> strList = new ArrayList&lt;&gt;();<br>test(strList);<br>‘’’<br>原因是<strong>泛型和数组有所不同，假设Foo是Bar的一个子类型（子类或子接口），那么Foo[]依然是Bar[]的子类型，但G<foo>不是G<bar>的子类型</bar></foo></strong>。<br>所以引入了类型通配符来表示各种泛型List的父类。<br>我们可以将上面方法改写为如下形式：<br>‘’’<br>public void test(List&lt;?&gt; c)<br>{<br>    for(int i = 0; i &lt; c.size(); i++)<br>    {<br>        System.out.println(c.get(i));<br>    }<br>}<br>‘’’<br>类型通配符上限通过List&lt;? extends xxx&gt;形式定义。它表示所有xxx泛型List的父类。</string></object></p>
+<p>###泛型方法</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/11/Java泛型/" data-id="cjab5eebp00078o40euxg0pss" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Java集合" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/06/10/Java集合/" class="article-date">
@@ -85,13 +522,13 @@
       
         <p>在编程中，常常需要集中存放多个数据。从传统意义上讲，数组是我们的一个很好的选择，前提是我们事先已经明确知道我们将要保存的对象的数量。一旦在数组初始化时指定了这个数组长度，这个数组长度就是不可变的，如果我们需要保存一个可以动态增长的数据(在编译时无法确定具体的数量)，java的集合类就是一个很好的设计方案了。</p>
 <p>Java集合就像一个容器，我们可以把<strong>对象的引用</strong>“丢进”该容器中。<br>Java的集合类是为了<strong>保存数量不确定的数据，以及保存具有映射关系的数据_</strong>（也被称为关联数组）。所有的集合类都位于java.util包下。</p>
-<p>Java的集合类主要由两个接口派生而成：Collection和Map（区别在于容器中每个位置保存的元素个数），Collection和Map是Java集合框架的根接口，这两个接口又包含了一些子接口或实现类。Collection接口派生的接口有Set、List及Queue。<br><a href="http://images.cnitblog.com/i/532548/201404/262238192165666.jpg" target="_blank" rel="external">关系图</a> </p>
+<p>Java的集合类主要由两个接口派生而成：Collection和Map（区别在于容器中每个位置保存的元素个数），Collection和Map是Java集合框架的根接口，这两个接口又包含了一些子接口或实现类。Collection接口派生的接口有Set、List及Queue。<br><img src="http://images.cnitblog.com/i/532548/201404/262238192165666.jpg" alt="关系图"> </p>
 <h2 id="Collection接口"><a href="#Collection接口" class="headerlink" title="Collection接口"></a>Collection接口</h2><ol>
 <li>Collection接口里定义的方法可用于操作Set、list和Queue集合。方法如下：<br>boolean add(Object o):向集合添加一个元素。如果collection被改变则返回true。<br>void clear():删除collection中的所有元素。<br>boolean contains(Object o):如果collection中包含指定元素返回true。<br>boolean isEmpty():返回集合是否为空。<br>int size():返回collection里元素的个数。<br>Object[] toArray():返回一个包含所有collection中元素的数组。<br>详情参考：<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html" target="_blank" rel="external">http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html</a></li>
 </ol>
 <p>tip：当使用System.out.println方法来输出collection时，将输出[ele1,ele2,…]的形式，是因为所有的Collection实现类都重写了toString()方法。</p>
 <ol>
-<li>如果想依次访问集合里的每一个元素，则可以采用以下两种方式遍历集合元素。<br> (1) #### 使用Iterator接口遍历集合元素。<pre><code>Iterator对象也被称为迭代器，只有存在一个被迭代的Collection，Iterator才有意义。有如下三个方法:
+<li>如果想依次访问集合里的每一个元素，则可以采用以下两种方式遍历集合元素。<br> (1) ### 使用Iterator接口遍历集合元素。<pre><code>Iterator对象也被称为迭代器，只有存在一个被迭代的Collection，Iterator才有意义。有如下三个方法:
 boolean hasNext()：如果还有没被遍历的元素，则返回true。
 Object next():返回集合的下个元素。
 void remove():集合上一次next()返回的集合元素。
@@ -108,7 +545,7 @@ while(it.hasNext())
 }
 &apos;&apos;&apos;
 Iterator是快速失败机制，一旦在__迭代过程中检测到该集合被修改__，程序立即引发ConcurrentModificationException异常。
-</code></pre> (2) #### 使用foreach循环遍历集合元素<pre><code>&apos;&apos;&apos;
+</code></pre> (2) ### 使用foreach循环遍历集合元素<pre><code>&apos;&apos;&apos;
 Collection fruits = new HashSet();
 fruits.add(&quot;Apple&quot;);
 fruits.add(&quot;Banana&quot;);
@@ -126,19 +563,16 @@ System.out.println(fruits);
 &apos;&apos;&apos;        与使用Iterator相似，foreach循环中的迭代变量也__不是集合元素本身__，系统只是依次把集合元素的__值__赋给迭代变量。同样，当使用foreach循环迭代访问集合元素时，该集合也不能被改变，否则引发ConcurrentModificationException异常
 </code></pre></li>
 </ol>
-<h3 id="Set集合（无序、不可重复）"><a href="#Set集合（无序、不可重复）" class="headerlink" title="Set集合（无序、不可重复）"></a>Set集合（无序、不可重复）</h3><p>Set集合不允许包含相同的元素，<strong>Set判断两个对象相同根据equals方法</strong>，只要两个对象用equals方法比较返回true，Set就会接受这两个对象。Set的使用方法基本同于Collection。<br>‘’’<br>Set fruits = new HashSet();<br>fruits.add(new String(“Apple”));<br>boolean result = fruits.add(new String(“Apple”)); //返回false<br>‘’’<br>    (1)### HashSet<br>    HashSet是Set接口的典型实现，HashSet使用HASH算法来存储集合中的元素，因此具有良好的存取和查找性能。    当向HashSet集合中存入一个元素时，HashSet会调用该对象的hashCode()方法来得到该对象的hashCode值，然后根据该hashCode值决定该对象在HashSet中的存储位置。<br>    HashSet集合判断两个元素相等的标准是两个对象通过equals()方法比较相等，并且两个对象的hashCode()方法的返回值相等。    当向HashSet中添加可变对象时须谨慎，如果修改HashSet集合中的对象，可能导致该对象与集合中的其他对象相等，从而导致HashSet无法准确访问该对象。<br>    (2)### LinkedHashSet     LinkedHashSet集合也是根据元素的hashCode值来决定元素的存储位置，但和HashSet不同的是，它同时使用<strong>链表</strong>维护元素的次序，这样使得元素看起来是以插入的顺序保存的。    LinkedHashSet需要维护元素的插入顺序，因此性能略低于HashSet的性能，但在迭代访问Set里的全部元素时(遍历)将有很好的性能(链表很适合进行遍历)<br>    (3)### TreeSet        TreeSet是SortedSet接口的实现类，采用红黑树的数据结构来存储集合元素，确保集合元素处于排序（根据元素实际值的大小，而不是插入顺序）状态。有如下方法：<br>    Object first()：返回集合中的第一个元素。<br>    Object lower(Object e)：返回小于指定元素的集合中的最大元素。<br>    SortedSet subSet(fromElement,toElement):返回此Set的子集合，范围从fromElement到toElement。<br>    SortedSet headSet(toElement):返回小于toElement的元素组成的此Set子集。<br>    TreeSet支持两种排序方式：自然排序和定制排序。默认情况下采取自然排序。<br>        (a)#### 自然排序<br>        TreeSet会调用集合元素的compareTo(Object obj)方法来比较元素的关系大小，然后升序排列。Java提供了一个Comparable接口，该接口里定义了一个compareTo(Object obj)方法。实现该接口的类必须实现该方法，那么实现该接口的类的对象就可以比较大小。<br>        如果试图把一个对象添加到TreeSet，则该对象的类必须实现Comparable接口，否则引发ClassCastException异常。<br>        另，在实现compareTo(Object obj)方法时，需将比较对象obj强制类型转换成相同对象。当TreeSet添加对象时，若不是同一个类的对象则引发异常。<br>        TreeSet判断两个对象是否相等是根据compareTo(Object obj)方法比较是否返回0。<br>        (b)#### 定制排序<br>        通过Comparator接口，该接口里包含一个int compare(T o1, T o2)方法。        如果需要实现定制排序，则需要在创建TreeSet集合对象时，提供一个Comparator对象与该TreeSet集合关联，由该Comparator对象负责集合元素的排序逻辑。<br>        ‘’’<br>        TreeSet ts = new TreeSet(new Comparator()<br>        {<br>            public int compare(Object o1,Object o2)<br>            {<br>                M m1 = (M)o1;<br>                M m2 = (M)o2;<br>                return m1.age &gt; m2.age ? -1 : m1.age &lt; m2.age 1 ：0；<br>            }<br>        });<br>        ‘’’<br>    (4)### EnumSet    EnumSet是一个专门为枚举类设计的集合类，EnumSet中所有元素都必须是指定枚举类型的枚举值，该枚举类型在创建EnumSet时显式、或隐式地指定。EnumSet的集合元素也是有序的，<br>　　它们以枚举值在Enum类内的定义顺序来决定集合元素的顺序</p>
-<h2 id="List（有序、可重复）集合"><a href="#List（有序、可重复）集合" class="headerlink" title="List（有序、可重复）集合"></a>List（有序、可重复）集合</h2><p>集合中的每个元素都有对应的顺序索引。List集合默认按元素的添加顺序设置元素的索引。<br><strong>List</strong>作为Collection接口的<strong>子接口</strong>（List是一个借口，不能实例化，只能，当然可以使用Collection接口里的全部方法，且由于List是有序即可，因此List集合添加了一些根据索引操作的方法：<br>void add(int index,Object element):将元素element插入到List集合的index处。<br>Object get(int index):返回集合index索引处的元素<br>int indexOf(Object o):返回对象o在List集合中第一次出现的位置索引<br>Object remove(int index):删除并返回index索引处的元尿素<br>Object set(int index, Object element):将index索引处的元素替换成element对象，返回新元素<br>List subList(int fromIndex, int toIndex):<br><strong>List判断两个对象相等只要通过equals()方法比较返回true即可</strong>。<br>与Set只提供一个iterator()方法不同，List还额外提供一个listIterator()方法，该方法返回一个ListIterator对象，ListIterator接口继承了Iterator接口，再次基础上添加了如下方法：hasPrevious()、previous()、add()。</p>
-<pre><code>##### ArrayList和Vector实现类     ArrayList和Vector是基于数组实现的List类，封装了一个动态、允许再分配的Object[]数组。（一次性增加initialCapacity可以提高性能）。ArrayList和Vector用法几乎一样，但Vector是一个古老的集合，虽然它线程安全，还提供Stack子类（可用LinkedList代替），但依然不推荐使用。
-##### LinkedList实现类
-LinkedList类是List接口的实现类，且实现了Deque接口，因此可以当成栈来使用。
-</code></pre><h2 id="Queue集合"><a href="#Queue集合" class="headerlink" title="Queue集合"></a>Queue集合</h2><p>Queue用于模拟队列这种数据结构，FIFO。通常，队列不允许随机访问队列中的元素。Queue接口定义了如下方法：<br>void add(Object e):将指定元素加入此队列的尾部。<br>Object element():获取头部元素，但不删除。<br>boolean offer(Object e):类似于add()、但容量有限时更好<br>Object peek():获取头部元素，但不删除。<br>Object poll():获取头部元素，并删除。<br>Object remove():获取头部元素，并删除。<br>    (1)### PriorityQueue实现类<br>     保存队列元素的顺序不是按加入队列的顺序，而是按队列元素的大小进行重新排序。<br>    (2)### Deque接口<br>     Deque接口是Queue接口的子接口，代表一个双端队列，但也能当作栈来使用。它定义了一些双端方法：<br>     void addFirst(Object e):<br>     void addLast(Object e):<br>     Iterator descendingnIterator():<br>     Object getFirst():<br>     Object getLast():<br>     Deque接口提供了一个典型的实现类:ArrayDeque，当作栈来使用。</p>
-<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><p>Map用于保存具有映射关系的数据，因此Map保存着两组值，一组值用于保存Map里的key，另外一组值用于保存Map里的value，key和value都有可以是任何引用类型的数据。key不允许重复，即同一个Map对象的任何两个key通过equals方法比较结果总是返回false。<br>如果把Map里的所有key放在一起来看，他们就组成了一个Set集合（无序、不重复），可通过keySet()方法返回Map里的所有key组成的Set集合。<br>如果把Map里的所有value放在一起来看，它们又类似于一个List:元素之间可重复，每个元素可以根据索引来查找。如果需要从List集合中取出元素，则需要提供该元素的数字索引你；如果需要从Map中取出元素，则需要提供该元素的key索引。<br>Map接口中定义了如下常用方法：<br>void clear():删除该Map对象的所有key-value对。<br>boolean containsKey(Object key):查询Map中是否包含指定的key。<br>boolean containsValue(Object value):查询Map中是否包含一个或多个value。<br>boolean isEmpty():查询该Map是否为空<br>Object get(Object key):返回指定key所对应的value。<br>Object remove(Object key):删除指定key所对应的key-value对。如果该key不存在返回null。<br>Object put(Object key,Object value):添加一个key-value对，如果Map中已存在该key，则将进到key-value覆盖原来的key-value对。<br>Set keySet():返回该Map中所有key组成的Set集合。<br>Collection values():返回该Map中所有value组成的Collection。<br>int size():返回该Map里的key-value对的个数。<br>toString():返回如下格式的字符串：{key1=value1，key2=value2,…}<br>    (1)### HashMap和Hashtable实现类<br>    这二者的关系完全类似与ArrayList和Vector（Vector古老、方法烦琐、线程安全、性能稍差），同时HashMap允许null作为key或value。<br>    为了存储、获取HashMap、Hashtable中的对象，用作key的对象必须实现hashCode()和equals()方法。<br>    和HashSet集合不能保证元素的顺序一样，HashMap也不能保证key-value对的顺序。类似于HashSet判断两个key是否相等的标准也是: 两个key通过equals()方法比较返回true，同时两个key的hashCode值也相等。与HashSet类似，如果使用可变对象作为HashMap、Hashtable的key，并且程序修改了key对象，则肯能再无法准确方位到被修改该过的key<br>    (2)### LinkedHashMap实现类    LinkedHashMap是HashMap的子类，它使用双向链表来维护key-value对的次序。该链表维护Map的迭代顺序与key-value对的插入顺序保持一致。<br>    (3)### 使用Properties读写属性文件    Properties类是Hashtable类的子类。Properties类可以把Map对象和属性文件关联起来，从而可以把Map对象中的key-value对写入到属性文件中，也可以把属性文件中的”属性名=属性值”加载到Map对象中。有如下三个方法：<br>    String getProperty(String key):获取Properties中指定属性名对应的属性值。<br>    String getProperty(String key,String defaultValue):同上，若不存在知道那个的key则指定默认值。<br>    Object setProperty(String key,String value):设置属性值。<br>    void load(InputStream inStream):从属性文件（以输入流表示）中加载key-value对，追加到Properties里。<br>    void score(OutputStream out,String comments):输出到指定的属性文件中（以输出流表示）。<br>    (4)### SortedMap接口和TreeMap实现类    TreeMap是一个红黑树结构，每个key-value对即为红黑树的一个节点。TreeMap存储节点时，需要根据key进行排序。所以TreeMap可以保证所有的key-value对处于有序状态。同样，TreeMap也有两种排序方式: 自然排序、定制排序。<br>        (a)#### 自然排序<br>        TreeMap的key必须实现Comparable接口，而且所有key应该是同一个类的对象，否则ClassCastException异常。<br>        (b)#### 定制排序<br>        创建TreeMap时，传入一个Comparator对象，该对象负责排序。<br>    (5)##### WeakHashMap实现类    WeakHashMap与HashMap的用法基本相似。区别在于，HashMap的key保留了对实际对象的”强引用”，这意味着只要该HashMap对象不被销毁，该HashMap所引用的对象就不会被垃圾回收。但WeakHashMap的key只保留了对实际对象的弱引用，这意味着如果WeakHashMap对象的key所引用的对象没有被其他强引用变量所引用，则这些key所引用的对象可能被垃圾回收，当垃圾回收了该key所对应的实际对象之后，WeakHashMap也可能自动删除这些key所对应的key-value对.<br>    (6)### IdentityHashMap实现类<br>    entityHashMap的实现机制与HashMap基本相似，在IdentityHashMap中，当且仅当两个key严格相等(key1 == key2)时，IdentityHashMap才认为两个key相等.<br>    (7)### EnumMap实现类    EnumMap是一个与枚举类一起使用的Map实现，EnumMap中的所有key都必须是单个枚举类的枚举值。创建EnumMap时必须显式或隐式指定它对应的枚举类。EnumMap根据key的自然顺序来维护key-value对的顺序。</p>
+<h2 id="Set集合（无序、不可重复）"><a href="#Set集合（无序、不可重复）" class="headerlink" title="Set集合（无序、不可重复）"></a>Set集合（无序、不可重复）</h2><p>Set集合不允许包含相同的元素，<strong>Set判断两个对象相同根据equals方法</strong>，只要两个对象用equals方法比较返回true，Set就会接受这两个对象。Set的使用方法基本同于Collection。<br>‘’’<br>Set fruits = new HashSet();<br>fruits.add(new String(“Apple”));<br>boolean result = fruits.add(new String(“Apple”)); //返回false<br>‘’’<br>    (1)### HashSet<br>    HashSet是Set接口的典型实现，HashSet使用HASH算法来存储集合中的元素，因此具有良好的存取和查找性能。    当向HashSet集合中存入一个元素时，HashSet会调用该对象的hashCode()方法来得到该对象的hashCode值，然后根据该hashCode值决定该对象在HashSet中的存储位置。<br>    HashSet集合判断两个元素相等的标准是两个对象通过equals()方法比较相等，并且两个对象的hashCode()方法的返回值相等。    当向HashSet中添加可变对象时须谨慎，如果修改HashSet集合中的对象，可能导致该对象与集合中的其他对象相等，从而导致HashSet无法准确访问该对象。<br>    (2)### LinkedHashSet     LinkedHashSet集合也是根据元素的hashCode值来决定元素的存储位置，但和HashSet不同的是，它同时使用<strong>链表</strong>维护元素的次序，这样使得元素看起来是以插入的顺序保存的。    LinkedHashSet需要维护元素的插入顺序，因此性能略低于HashSet的性能，但在迭代访问Set里的全部元素时(遍历)将有很好的性能(链表很适合进行遍历)<br>    (3)### TreeSet        TreeSet是SortedSet接口的实现类，采用红黑树的数据结构来存储集合元素，确保集合元素处于排序（根据元素实际值的大小，而不是插入顺序）状态。有如下方法：<br>    Object first()：返回集合中的第一个元素。<br>    Object lower(Object e)：返回小于指定元素的集合中的最大元素。<br>    SortedSet subSet(fromElement,toElement):返回此Set的子集合，范围从fromElement到toElement。<br>    SortedSet headSet(toElement):返回小于toElement的元素组成的此Set子集。<br>    TreeSet支持两种排序方式：自然排序和定制排序。默认情况下采取自然排序。<br>        (a)### 自然排序<br>        TreeSet会调用集合元素的compareTo(Object obj)方法来比较元素的关系大小，然后升序排列。Java提供了一个Comparable接口，该接口里定义了一个compareTo(Object obj)方法。实现该接口的类必须实现该方法，那么实现该接口的类的对象就可以比较大小。<br>        如果试图把一个对象添加到TreeSet，则该对象的类必须实现Comparable接口，否则引发ClassCastException异常。<br>        另，在实现compareTo(Object obj)方法时，需将比较对象obj强制类型转换成相同对象。当TreeSet添加对象时，若不是同一个类的对象则引发异常。<br>        TreeSet判断两个对象是否相等是根据compareTo(Object obj)方法比较是否返回0。<br>        (b)### 定制排序<br>        通过Comparator接口，该接口里包含一个int compare(T o1, T o2)方法。        如果需要实现定制排序，则需要在创建TreeSet集合对象时，提供一个Comparator对象与该TreeSet集合关联，由该Comparator对象负责集合元素的排序逻辑。<br>        ‘’’<br>        TreeSet ts = new TreeSet(new Comparator()<br>        {<br>            public int compare(Object o1,Object o2)<br>            {<br>                M m1 = (M)o1;<br>                M m2 = (M)o2;<br>                return m1.age &gt; m2.age ? -1 : m1.age &lt; m2.age 1 ：0；<br>            }<br>        });<br>        ‘’’<br>    (4)### EnumSet    EnumSet是一个专门为枚举类设计的集合类，EnumSet中所有元素都必须是指定枚举类型的枚举值，该枚举类型在创建EnumSet时显式、或隐式地指定。EnumSet的集合元素也是有序的，<br>　　它们以枚举值在Enum类内的定义顺序来决定集合元素的顺序</p>
+<h2 id="List（有序、可重复）集合"><a href="#List（有序、可重复）集合" class="headerlink" title="List（有序、可重复）集合"></a>List（有序、可重复）集合</h2><p>集合中的每个元素都有对应的顺序索引。List集合默认按元素的添加顺序设置元素的索引。<br><strong>List</strong>作为Collection接口的<strong>子接口</strong>（List是一个借口，不能实例化，只能，当然可以使用Collection接口里的全部方法，且由于List是有序即可，因此List集合添加了一些根据索引操作的方法：<br>void add(int index,Object element):将元素element插入到List集合的index处。<br>Object get(int index):返回集合index索引处的元素<br>int indexOf(Object o):返回对象o在List集合中第一次出现的位置索引<br>Object remove(int index):删除并返回index索引处的元尿素<br>Object set(int index, Object element):将index索引处的元素替换成element对象，返回新元素<br>List subList(int fromIndex, int toIndex):<br><strong>List判断两个对象相等只要通过equals()方法比较返回true即可</strong>。<br>与Set只提供一个iterator()方法不同，List还额外提供一个listIterator()方法，该方法返回一个ListIterator对象，ListIterator接口继承了Iterator接口，再次基础上添加了如下方法：hasPrevious()、previous()、add()。<br>    (1)### ArrayList和Vector实现类     ArrayList和Vector是基于数组实现的List类，封装了一个动态、允许再分配的Object[]数组。（一次性增加initialCapacity可以提高性能）。ArrayList和Vector用法几乎一样，但Vector是一个古老的集合，虽然它线程安全，还提供Stack子类（可用LinkedList代替），但依然不推荐使用。<br>    (2)### LinkedList实现类<br>    LinkedList类是List接口的实现类，且实现了Deque接口，因此可以当成栈来使用。</p>
+<h2 id="Queue集合"><a href="#Queue集合" class="headerlink" title="Queue集合"></a>Queue集合</h2><p>Queue用于模拟队列这种数据结构，FIFO。通常，队列不允许随机访问队列中的元素。Queue接口定义了如下方法：<br>void add(Object e):将指定元素加入此队列的尾部。<br>Object element():获取头部元素，但不删除。<br>boolean offer(Object e):类似于add()、但容量有限时更好<br>Object peek():获取头部元素，但不删除。<br>Object poll():获取头部元素，并删除。<br>Object remove():获取头部元素，并删除。<br>    (1)### PriorityQueue实现类<br>     保存队列元素的顺序不是按加入队列的顺序，而是按队列元素的大小进行重新排序。<br>    (2)### Deque接口<br>     Deque接口是Queue接口的子接口，代表一个双端队列，但也能当作栈来使用。它定义了一些双端方法：<br>     void addFirst(Object e):<br>     void addLast(Object e):<br>     Iterator descendingnIterator():<br>     Object getFirst():<br>     Object getLast():<br>     Deque接口提供了一个典型的实现类:ArrayDeque，当作栈来使用。</p>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><p>Map用于保存具有映射关系的数据，因此Map保存着两组值，一组值用于保存Map里的key，另外一组值用于保存Map里的value，key和value都有可以是任何引用类型的数据。key不允许重复，即同一个Map对象的任何两个key通过equals方法比较结果总是返回false。<br>如果把Map里的所有key放在一起来看，他们就组成了一个Set集合（无序、不重复），可通过keySet()方法返回Map里的所有key组成的Set集合。<br>如果把Map里的所有value放在一起来看，它们又类似于一个List:元素之间可重复，每个元素可以根据索引来查找。如果需要从List集合中取出元素，则需要提供该元素的数字索引你；如果需要从Map中取出元素，则需要提供该元素的key索引。<br>Map接口中定义了如下常用方法：<br>void clear():删除该Map对象的所有key-value对。<br>boolean containsKey(Object key):查询Map中是否包含指定的key。<br>boolean containsValue(Object value):查询Map中是否包含一个或多个value。<br>boolean isEmpty():查询该Map是否为空<br>Object get(Object key):返回指定key所对应的value。<br>Object remove(Object key):删除指定key所对应的key-value对。如果该key不存在返回null。<br>Object put(Object key,Object value):添加一个key-value对，如果Map中已存在该key，则将进到key-value覆盖原来的key-value对。<br>Set keySet():返回该Map中所有key组成的Set集合。<br>Collection values():返回该Map中所有value组成的Collection。<br>int size():返回该Map里的key-value对的个数。<br>toString():返回如下格式的字符串：{key1=value1，key2=value2,…}<br>    (1)### HashMap和Hashtable实现类<br>    这二者的关系完全类似与ArrayList和Vector（Vector古老、方法烦琐、线程安全、性能稍差），同时HashMap允许null作为key或value。<br>    为了存储、获取HashMap、Hashtable中的对象，用作key的对象必须实现hashCode()和equals()方法。<br>    和HashSet集合不能保证元素的顺序一样，HashMap也不能保证key-value对的顺序。类似于HashSet判断两个key是否相等的标准也是: 两个key通过equals()方法比较返回true，同时两个key的hashCode值也相等。与HashSet类似，如果使用可变对象作为HashMap、Hashtable的key，并且程序修改了key对象，则肯能再无法准确方位到被修改该过的key<br>    (2)### LinkedHashMap实现类    LinkedHashMap是HashMap的子类，它使用双向链表来维护key-value对的次序。该链表维护Map的迭代顺序与key-value对的插入顺序保持一致。<br>    (3)### 使用Properties读写属性文件    Properties类是Hashtable类的子类。Properties类可以把Map对象和属性文件关联起来，从而可以把Map对象中的key-value对写入到属性文件中，也可以把属性文件中的”属性名=属性值”加载到Map对象中。有如下三个方法：<br>    String getProperty(String key):获取Properties中指定属性名对应的属性值。<br>    String getProperty(String key,String defaultValue):同上，若不存在知道那个的key则指定默认值。<br>    Object setProperty(String key,String value):设置属性值。<br>    void load(InputStream inStream):从属性文件（以输入流表示）中加载key-value对，追加到Properties里。<br>    void score(OutputStream out,String comments):输出到指定的属性文件中（以输出流表示）。<br>    (4)### SortedMap接口和TreeMap实现类    TreeMap是一个红黑树结构，每个key-value对即为红黑树的一个节点。TreeMap存储节点时，需要根据key进行排序。所以TreeMap可以保证所有的key-value对处于有序状态。同样，TreeMap也有两种排序方式: 自然排序、定制排序。<br>        (a)### 自然排序<br>        TreeMap的key必须实现Comparable接口，而且所有key应该是同一个类的对象，否则ClassCastException异常。<br>        (b)### 定制排序<br>        创建TreeMap时，传入一个Comparator对象，该对象负责排序。<br>    (5)### WeakHashMap实现类    WeakHashMap与HashMap的用法基本相似。区别在于，HashMap的key保留了对实际对象的”强引用”，这意味着只要该HashMap对象不被销毁，该HashMap所引用的对象就不会被垃圾回收。但WeakHashMap的key只保留了对实际对象的弱引用，这意味着如果WeakHashMap对象的key所引用的对象没有被其他强引用变量所引用，则这些key所引用的对象可能被垃圾回收，当垃圾回收了该key所对应的实际对象之后，WeakHashMap也可能自动删除这些key所对应的key-value对.<br>    (6)### IdentityHashMap实现类<br>    entityHashMap的实现机制与HashMap基本相似，在IdentityHashMap中，当且仅当两个key严格相等(key1 == key2)时，IdentityHashMap才认为两个key相等.<br>    (7)### EnumMap实现类    EnumMap是一个与枚举类一起使用的Map实现，EnumMap中的所有key都必须是单个枚举类的枚举值。创建EnumMap时必须显式或隐式指定它对应的枚举类。EnumMap根据key的自然顺序来维护key-value对的顺序。</p>
 <h2 id="Collections类–操作集合的工具类"><a href="#Collections类–操作集合的工具类" class="headerlink" title="Collections类–操作集合的工具类"></a>Collections类–操作集合的工具类</h2><p>Java提供了一个操作Set、List和Map等集合的工具类，该工具类里提供了大量方法对集合元素进行排序、查询和修改等操作，还提供了将集合对象设置为不可变、对集合对象实现同步控制等方法。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/10/Java集合/" data-id="cj3rbxpnw0003os40xeikdq59" class="article-share-link">Share</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/10/Java集合/" data-id="cjab5eecg00098o4017lj7ccs" class="article-share-link">Share</a>
       
       
     </footer>
@@ -176,371 +610,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/08/Java回收机制/" data-id="cj3rbxpnf0001os400s6vbx40" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java内部类" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/06/08/Java内部类/" class="article-date">
-  <time datetime="2017-06-08T02:57:19.000Z" itemprop="datePublished">2017-06-08</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/08/Java内部类/">Java内部类</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ol>
-<li>不允许同一个包中的其他类访问该类。</li>
-<li>内部类成员可直接访问外部类的私有数据，反之不成立。</li>
-<li>匿名内部类适合用于创建哪些仅需要一次使用的类。</li>
-<li>成员内部类是一种和Field、方法、构造器相似的类内部。局部内部类和匿名内部类则不是类成员。</li>
-<li>成员内部类分为两种：静态内部类和非静态内部类。</li>
-<li>编译生成两个class文件，一个是外部类的class文件，一个是成员内部类的class文件OuterClass$InnerClass.class。</li>
-</ol>
-<h2 id="非静态内部类"><a href="#非静态内部类" class="headerlink" title="非静态内部类"></a>非静态内部类</h2><h4 id="非静态内部类和外部类成员的关系"><a href="#非静态内部类和外部类成员的关系" class="headerlink" title="非静态内部类和外部类成员的关系"></a>非静态内部类和外部类成员的关系</h4><p>非静态内部类里可以直接访问外部类的private成员，这是因为在非静态内部类对象里，保存了一个它寄存的外部类对象的引用（当调用非静态内部类的实例方法时，必须有一个非静态内部类实例，而非静态内部类实例必须是寄存在外部类实例里）。</p>
-<h4 id="非静态内部类对象和外部类对象的关系"><a href="#非静态内部类对象和外部类对象的关系" class="headerlink" title="非静态内部类对象和外部类对象的关系"></a>非静态内部类对象和外部类对象的关系</h4><p>非静态内部类对象必须寄存在外部类对象里，而外部类对象则不必一定有非静态内部类对象寄存其中。因此外部类对象访问非静态内部类成员，可能非静态普通内部类对象根本不存在，而非静态内部类对象访问外部类成员时，外部类对象一定存在。</p>
-<p>非静态内部类不允许定义静态成员。</p>
-<p>##静态内部类<br>静态内部类属于外部类本身。（static关键字的作用是把类的成员变成类相关而不是实例相关）<br>静态内部类不能访问外部类的实例成员，只能访问外部类的类成员。<br>外部类不能直接访问静态内部类的成员，但可以使用静态内部类的类名作为调用者来访问静态内部类成员，也可以使用静态内部类对象作为调用者来访问静态内部类的实例成员。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">public class OutterClass</div><div class="line">&#123;</div><div class="line">	static class StaticInnerClass</div><div class="line">	&#123;</div><div class="line">		private static int prop1 = 2;</div><div class="line">		private int prop2 = 9;</div><div class="line">	&#125;</div><div class="line">	public void accessInnerProp()</div><div class="line">	&#123;</div><div class="line">		//System.out.println(prop1);</div><div class="line">		//上面代码错误</div><div class="line">		System.out.println(StaticInnerClass.prop1); //通过类名访问静态内部类的类成员</div><div class="line">		System.out.println(new StaticInnerClass().pro2); //通过实例访问静态内部类的实例成员</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>外部调用内部类的方法：<a href="http://blog.csdn.net/hanshileiai/article/details/6690012" target="_blank" rel="external">http://blog.csdn.net/hanshileiai/article/details/6690012</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/08/Java内部类/" data-id="cj3rbxpn10000os40bbyxtc9t" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Java基本类型与包装类的区别" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/06/07/Java基本类型与包装类的区别/" class="article-date">
-  <time datetime="2017-06-07T02:30:14.000Z" itemprop="datePublished">2017-06-07</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/07/Java基本类型与包装类的区别/">Java基本类型与包装类的区别</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>####JVM的内存区域组成<br>java把内存非为栈内存，堆内存<br>(1)在函数中定义的基本类型变量和对象的引用变量都在函数的栈内存中分配；<br>(2)堆内存用来存放由new创建的对象和数组以及对象的实例变量。在函数（代码块）中定义一个变量时，java就在栈中为这个变量分配内存空间，当超过变量的作用域后，java会自动释放掉为该变量所分配的内存空间；在堆中分配的内存由java虚拟机的自动垃圾回收器来管理</p>
-<h4 id="java中数据在内存中是如何存储的"><a href="#java中数据在内存中是如何存储的" class="headerlink" title="java中数据在内存中是如何存储的"></a>java中数据在内存中是如何存储的</h4><ol>
-<li>基本数据类型    java的基本数据类型有8种，即int,short,long,byte,float,double,boolean,char(注意，并没有String的基本类型)。这种类型的定义是通过诸如int a = 3；long b = 255L；的形式来定义的。如int a = 3；这里的a是一个指向int类型的引用，指向3这个字面值。这些字面值的数据，由于大小可知，生存期可知(这些字面值定义在某个程序块里面，程序块退出后，字段值就消失了)，出于追求速度的原因，<strong>就存在于栈中</strong>。<br>栈有一个很重要的特殊性，就是存在栈中的数据可以共享。</li>
-<li>对象<br>在java中，创建一个对象不包括对象的声明和实例化。<br>(1)声明对象时，将在<strong>栈内存为对象的引用变量分配内存空间</strong>，但此时对象是一个空对象，不能使用，因为它还没有引用任何实体。<br>(2)对象实例化时，堆内存会为类的成员变量分配内存，将其初始化为各数据类型的默认值；接着进行进行显式初始化；最后调用构造方法，为成员变量赋值。返回<strong>堆内存中的对象</strong>。<br>(3)创建多个不同的对象实例<br>一个类通过使用new运算符可以创建多个不同的对象实例，这些对象实例将在堆中被分配不同的内存空间。在堆内存中分别为不同对象的成员变量分配内存空间。<br>(4)包装类<br>基本类型都有对应的包装类。基本类型的定义都是直接在栈中，如果用包装类来创建对象，就和普通对象一样了。例如：int i=0；i直接存储在栈中。Integer i（i此时是对象）= new Integer(5)；这样，i对象<strong>数据存储在堆中</strong>，i的<strong>引用存储在栈中</strong>，通过栈中的引用来操作对象。<br>(5)String<br>String是一个引用类型。</li>
-</ol>
-<p>参考链接：<a href="http://blog.csdn.net/aaa1117a8w5s6d/article/details/8251456" target="_blank" rel="external">http://blog.csdn.net/aaa1117a8w5s6d/article/details/8251456</a><br>          <a href="http://www.cnblogs.com/tinyphp/p/3768214.html" target="_blank" rel="external">http://www.cnblogs.com/tinyphp/p/3768214.html</a> （==和equals的区别）<br>jvm只有一个堆区(heap)被所有线程共享，堆中不存放基本类型和对象引用，只存放对象本身</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/07/Java基本类型与包装类的区别/" data-id="cj3rbxpno0002os405oygwwsg" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-javascript引用类型" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/02/23/javascript引用类型/" class="article-date">
-  <time datetime="2017-02-23T09:26:55.000Z" itemprop="datePublished">2017-02-23</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/23/javascript引用类型/">javascript引用类型</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>引用类型是一种数据结构，用于将数据和功能组织在一起，与类相似。对象是某个特定引用类型的<strong>实例</strong>。新对象是使用new操作符后跟一个<strong>构造函数</strong>来创建。ECMAScript提供了很多原生引用类型。</p>
-<h5 id="Object类型"><a href="#Object类型" class="headerlink" title="Object类型"></a>Object类型</h5><p>创建Object实例的方式有两种：</p>
-<ol>
-<li>new操作符后跟Object构造函数<br>var person = new Object();</li>
-<li>使用<strong>对象字面量</strong>表示法，目的在于简化创建包含大量属性的对象的过程<br>var person = {<br>  name : “Becky”,<br>  age : 22,<br>  sex : 女<br>};<br>对象字面量也可封装函数参数</li>
-</ol>
-<h5 id="Array类型"><a href="#Array类型" class="headerlink" title="Array类型"></a>Array类型</h5><p>数组的项数保存在其length属性中，这个属性并非只读<br>创建数组的基本方式有两种：</p>
-<ol>
-<li><p>使用Array构造函数<br>var colors = new Array();<br>如果预先知道数组的长度，var colors = new Array(10);</p>
-</li>
-<li><p>使用数组字面量表示法<br>var colors = [“red”,”blue”,”white”];<br>colors[3] = “black”; //新增第四项</p>
-</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/23/javascript引用类型/" data-id="cj3rbxpp40008os407tqd4wl3" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-javascript垃圾收集" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/02/23/javascript垃圾收集/" class="article-date">
-  <time datetime="2017-02-23T08:43:53.000Z" itemprop="datePublished">2017-02-23</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/23/javascript垃圾收集/">javascript垃圾收集</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>首先要对内存管理概念有一个基本的认识，内存管理是指操作系统如何进行内存的分配和回收的机制。C和C++通过malloc，free函数来向操作系统请求内存和释放内存。这种机制的优点是分配内存和释放的效率很高，缺点是存在大量的内存分配和释放操作，程序员不小心忘记释放内存会造成内存泄漏。对于长期运行的软件来讲，这将是一个致命的威胁，因为系统的内存会逐渐被吃光。 </p>
-<p>因此，更新的编程语言，比如JAVA,C#,都提供了所谓“垃圾回收的机制”，运行时自身会运行相应的垃圾回收机制。程序员只需要申请内存，而不需要关注内存的释放。垃圾回收器(GC)会在适当的时候将已经终止生命周期的变量的内存给释放掉。</p>
-<p>&nbsp;&nbsp;javascript具有自动垃圾收集机制，执行环境会负责管理代码执行过程中使用的内存。</p>
-<p>垃圾收集器标识无用变量的策略一般有两个：标记清除（常见）和引用计数。</p>
-<p>javascript在进行内存管理及垃圾收集时最主要的一个问题就是分配给Web浏览器的可用内存数量通常通常比分给桌面应用程序的少（目的是防止运行JavaScript的网页耗尽全部系统内存而导致系统崩溃）。优化内存占用的最佳方式就是为执行中的代码只保存必要的数据，一旦数据不再有用，最好<strong>解除引用</strong>（通过将全局变量和全局对象的属性的值设置为null来释放其引用）</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/23/javascript垃圾收集/" data-id="cj3rbxpol0007os40rh0zdjuv" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-javascript实现放大镜" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/02/15/javascript实现放大镜/" class="article-date">
-  <time datetime="2017-02-15T08:25:15.000Z" itemprop="datePublished">2017-02-15</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/15/javascript实现放大镜/">javascript实现放大镜</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h5 id="html脚本"><a href="#html脚本" class="headerlink" title="html脚本"></a>html脚本</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">&lt;head&gt;</div><div class="line">	&lt;meta charset=&quot;utf-8&quot;&gt;</div><div class="line">	&lt;title&gt;放大镜&lt;/title&gt;</div><div class="line">&lt;/head&gt;</div><div class="line">&lt;body&gt;</div><div class="line">	&lt;div id=&quot;small-box&quot;&gt;</div><div class="line">	&lt;div id=&quot;float-box&quot;&gt;&lt;/div&gt;</div><div class="line">	&lt;img src=&quot;smallpicture.jpg&quot;&gt;</div><div class="line">	&lt;/div&gt;</div><div class="line">	&lt;div id=&quot;big-box&quot;&gt;</div><div class="line">	&lt;img src=&quot;bigpicture.jpg&quot;&gt;</div><div class="line">	&lt;/div&gt;</div><div class="line">&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure>
-<h5 id="css脚本"><a href="#css脚本" class="headerlink" title="css脚本"></a>css脚本</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">*&#123;</div><div class="line">	margin:0px;</div><div class="line">	padding:0px;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#small-box&#123;</div><div class="line">	position:relatve;</div><div class="line">	border:1px solid #ccc;</div><div class="line">	display:block;</div><div class="line">	width:400px;</div><div class="line">	height:255px;</div><div class="line">	margin:50px;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#float-box&#123;</div><div class="line">	display:none;</div><div class="line">	width:160px;</div><div class="line">	height:120px;</div><div class="line">	position:absolute;</div><div class="line">	background:#ffffcc;</div><div class="line">	border:1px solid #ccc;</div><div class="line">	filter:alpha(opacity=50);</div><div class="line">	opacity:0.5;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#big-box&#123;</div><div class="line">	display:none;</div><div class="line">	position:a ;</div><div class="line">	top:0px;</div><div class="line">	z-index:1;</div><div class="line">	left:460px;</div><div class="line">	width:410px;</div><div class="line">	height:307px;</div><div class="line">	overflow:hidden;  //定义溢出元素内容区的内容会如何处理，hidden：内容被修剪，并且其余内容不可见</div><div class="line">	border:1px solid #ccc;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#big-box img&#123;</div><div class="line">	position:absolute;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="js脚本"><a href="#js脚本" class="headerlink" title="js脚本"></a>js脚本</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">window.onload = function()&#123;</div><div class="line"></div><div class="line">//获取所需要操作的对象</div><div class="line">var smallBox = document.getElementById(&quot;small-box&quot;);</div><div class="line">var floatBox = document.getElementById(&quot;float-box&quot;);</div><div class="line">var bigBox = document.getElementById(&quot;big-box&quot;);</div><div class="line">var bigImage = bigBox.getElmentsByTagName(&quot;img&quot;)[0];</div><div class="line"></div><div class="line">//鼠标移动到对象上显示放大镜和放大镜放大后的图像</div><div class="line">smallBox.onmouseover = function()&#123;</div><div class="line">	floatBox.style.display = &quot;block&quot;;</div><div class="line">	bigBox.style.display = &quot;block&quot;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//鼠标移出对象时隐藏放大镜和放大镜放大后的图像</div><div class="line">smallBox.onmouseout = function()&#123;</div><div class="line">	floatBox.style.display = &quot;none&quot;;</div><div class="line">	bigBox.style.display = &quot;none&quot;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//鼠标在对象上移动触法的事件</div><div class="line">smallBox.onmousemove = function(e)&#123;</div><div class="line">	var event = e || window.event;</div><div class="line">	var left = event.clientX - smallBox.offsetLeft - floatBox.offsetWidth/2;</div><div class="line">	var top = event.clientY - smallBox.offsetTop - floatBox.offsetHeight/2;</div><div class="line">	</div><div class="line">	if(left&lt;0)&#123;</div><div class="line">		left = 0;</div><div class="line">	&#125;else if (left &gt; (smallBox.offsetWidth - floatBox.offsetWidth))&#123;</div><div class="line">	left = smallBox.offsetWidth - floatBox.offsetWidth;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	if(top&lt;0)&#123;</div><div class="line">		top = 0;</div><div class="line">	&#125;else if (top &gt; (smallBox.offsetHeight - floatBox.offsetHeight))&#123;</div><div class="line">	top = smallBox.offsetHeight - floatBox.offsetHeight;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	bigImage.style.left = -left/smallBox.offsetWidth*bigImage.offsetWidth +&quot;px&quot;;</div><div class="line">	bigImage.style.top = -top/smallBox.offsetHeight*bigImage.offsetHeight+&quot;px&quot;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/15/javascript实现放大镜/" data-id="cj3rbxpoi0006os40lk4eh4r2" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-第二篇" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/02/09/第二篇/" class="article-date">
-  <time datetime="2017-02-09T13:40:42.000Z" itemprop="datePublished">2017-02-09</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/09/第二篇/">第二篇</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>终于搭建完成了，原来之前是将github仓库误认为是访问地址，现在知道是访问“<a href="http://checkfrank.github.io/”（根据自己的github帐户名修改）" target="_blank" rel="external">http://checkfrank.github.io/”（根据自己的github帐户名修改）</a><br>这个网址可在仓库的settings-&gt;Github Pages看到<br>搭建过程详见<a href="http://blog.sina.com.cn/s/blog_4c44643f0102vuju.html" target="_blank" rel="external">http://blog.sina.com.cn/s/blog_4c44643f0102vuju.html</a><br>hexo文档：<a href="https://hexo.io/zh-cn/docs/setup.html" target="_blank" rel="external">https://hexo.io/zh-cn/docs/setup.html</a></p>
-<hr>
-<h3 id="总结一下大致过程："><a href="#总结一下大致过程：" class="headerlink" title="总结一下大致过程："></a>总结一下大致过程：</h3><h5 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h5><p>1.任意位置Git Bash，输入命令“npm install -g hexo<br>2.创建Hexo文件夹后，进入，Git Bash输入“hexo init”<br>3.安装依赖包：“npm install”<br>4.执行“hexo generate”和“hexo server”即可在本地localhost：4000查看</p>
-<h5 id="创建Repository"><a href="#创建Repository" class="headerlink" title="创建Repository"></a>创建Repository</h5><p>注意名字是Yourname.github.io<br>1.修改配置文件_config.yml里的deploy，<br>   “type: git<br>    repo: <a href="https://github.com/becky76/becky76.github.io">https://github.com/becky76/becky76.github.io</a><br>    branch: master”</p>
-<h5 id="设置SSH-keys"><a href="#设置SSH-keys" class="headerlink" title="设置SSH keys"></a>设置SSH keys</h5><p>配置SSH的官方教程是：<a href="https://help.github.com/articles/generating-ssh-keys/" target="_blank" rel="external">https://help.github.com/articles/generating-ssh-keys/</a><br>1.先检查是否存在了SSH keys “ls -al ~/.ssh<br>2.存在的话直接删除.ssh文件夹里面所有文件，.ssh文件夹在密钥文件在C:\Users\n.ssh<br>3.输入以下指令生成新的ssh key“ssh-keygen -t rsa -C “xxx@163.com””（邮箱是注册Github时用的邮箱），提示输入passphrase时可以直接回车不输入。<br>4.启动ssh-agent “ssh-agent -s”<br>5.添加新ssh key到ssh-agent “ssh-add ~/.ssh/id_rsa”<br>6.成功后拷贝id_rsa.pub到settings-&gt;SSH keys添加ssh key<br>7.是否成功添加SSH key可通过“ssh -T git@github.com”查询</p>
-<h5 id="完成部署"><a href="#完成部署" class="headerlink" title="完成部署"></a>完成部署</h5><p>1.“hexo generate”和“hexo deploy”，浏览器打开“<a href="http://becky76.github.io/”" target="_blank" rel="external">http://becky76.github.io/”</a></p>
-<h5 id="写文章"><a href="#写文章" class="headerlink" title="写文章"></a>写文章</h5><p>1.hexo new “title”<br>2.编辑source_posts\article.md<br>注意每次修改本地文件后，需要在Hexo目录下键入“hexo generate”才能保存</p>
-<p>嗯..界面确实很丑，有时间再改吧</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/09/第二篇/" data-id="cj3rbxpp60009os4030hvcfnj" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-My-first" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/02/07/My-first/" class="article-date">
-  <time datetime="2017-02-07T15:04:27.000Z" itemprop="datePublished">2017-02-07</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/07/My-first/">My first</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>今天是第一次搭建blog，截至目前耗时三小时</p>
-<hr>
-<p>据说文章正文只支持markdown格式</p>
-<h1 id="一级标题一个"><a href="#一级标题一个" class="headerlink" title="一级标题一个"></a>一级标题一个</h1><h2 id="二级标题两个"><a href="#二级标题两个" class="headerlink" title="二级标题两个"></a>二级标题两个</h2><h3 id="三级标题三个"><a href="#三级标题三个" class="headerlink" title="三级标题三个"></a>三级标题三个</h3><ol>
-<li>嗯。。</li>
-<li>这个就是</li>
-<li>有序列表</li>
-</ol>
-<ul>
-<li>无序列表</li>
-<li>可以用”*”或”-“</li>
-</ul>
-<p><strong>表示强调</strong></p>
-<p>一定要记得符号和文字之间加上一个字符的空格，这是一个好的语法习惯！</p>
-<hr>
-<p>编写文章要先new “title” ，然后编辑source_posts\article.md即可<br>哈哈哈 新建、删除或修改文章后，不需要重启“hexo s”~~，刷新一下即可浏览</p>
-<p>通过git bash命令“ls -al ~/.ssh”可检查是否已经存在了SSH keys<br>密钥文件在C:\Users\n.ssh<br>通过指令“ssh-keygen -t rsa -C “xxx@xxx.com” 连续敲三次回车<br>然后键入”ssh-agent -s” ，继续输入“ssh-add ~/.ssh/id_rsa”<br>如果报错Could not open a connection to your authentication agent.就输入两条指令“evali<br>ssh-agent -s’”和“ssh-add”。<br>到了这步，接下来就可以拷贝id_rsa.pub粘贴到Github账户的SSH key上。<br>最后可以通过“ssh -T git@github.com”命令测试一下。出现“Hi Becky76！……”即为成功</p>
-<hr>
-<p>最后再补充一点：<br>-虚拟主机：将一台服务器的空间划分为多个虚拟空间，再将系统资源分配给每个用户<br>-虚拟专用服务器：即VPS，是使用软件将一台服务器分割成多个虚拟服务器，VPS 上的系统、空间以及 CPU 资源都是用户独享，运行和管理可以看做与独立服务器相同<br>-独立服务器：选择独立服务器的网站通常是需要承接巨大的用户访问量</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/My-first/" data-id="cj3rbxpoa0005os40udpkqsdi" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/02/07/hello-world/" class="article-date">
-  <time datetime="2017-02-07T14:17:31.961Z" itemprop="datePublished">2017-02-07</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/07/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/02/07/hello-world/" data-id="cj3rbxpo10004os40hsoa40p4" class="article-share-link">Share</a>
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/08/Java回收机制/" data-id="cjab5eean00018o40sb8e853y" class="article-share-link">Share</a>
       
       
     </footer>
@@ -551,6 +621,10 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
 
   
 
+
+  <nav id="page-nav">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">__('next') &raquo;</a>
+  </nav>
 </section>
         
           <aside id="sidebar">
@@ -567,7 +641,7 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li></ul>
     </div>
   </div>
 
@@ -580,23 +654,23 @@ LinkedList类是List接口的实现类，且实现了Deque接口，因此可以�
       <ul>
         
           <li>
-            <a href="/2017/06/10/Java集合/">Java集合</a>
+            <a href="/2017/11/22/Java垃圾回收机制/">Java垃圾回收机制</a>
           </li>
         
           <li>
-            <a href="/2017/06/08/Java回收机制/">Java回收机制</a>
+            <a href="/2017/08/30/单例模式/">单例模式</a>
           </li>
         
           <li>
-            <a href="/2017/06/08/Java内部类/">Java内部类</a>
+            <a href="/2017/06/15/Java多线程/">Java多线程</a>
           </li>
         
           <li>
-            <a href="/2017/06/07/Java基本类型与包装类的区别/">Java基本类型与包装类的区别</a>
+            <a href="/2017/06/13/Java的I-O流/">Java的I/O流</a>
           </li>
         
           <li>
-            <a href="/2017/02/23/javascript引用类型/">javascript引用类型</a>
+            <a href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/">由ListNode引发的类中定义自身类的对象……</a>
           </li>
         
       </ul>

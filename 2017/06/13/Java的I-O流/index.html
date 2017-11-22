@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java的I/O流 | Becky</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Java的IO通过java.io包下的类和接口来支持，在java.io包下主要不包括输入、输出两种IO流，每种输入、输出流又可分为字节流和字符流两大类。除此之外，Java的IO流使用了一种装饰器设计模式，它将IO流分成底层节点流和上层处理流，其中节点流用于和底层的物理存储节点直接关联——不同的物理节点流获取节点流的方式可能存在一定的差异，但程序可以把不同的物理节点流包装成统一的处理流，从而允许程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java的I/O流">
+<meta property="og:url" content="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/13/Java的I-O流/index.html">
+<meta property="og:site_name" content="Becky">
+<meta property="og:description" content="Java的IO通过java.io包下的类和接口来支持，在java.io包下主要不包括输入、输出两种IO流，每种输入、输出流又可分为字节流和字符流两大类。除此之外，Java的IO流使用了一种装饰器设计模式，它将IO流分成底层节点流和上层处理流，其中节点流用于和底层的物理存储节点直接关联——不同的物理节点流获取节点流的方式可能存在一定的差异，但程序可以把不同的物理节点流包装成统一的处理流，从而允许程序">
+<meta property="og:updated_time" content="2017-06-13T08:23:56.685Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java的I/O流">
+<meta name="twitter:description" content="Java的IO通过java.io包下的类和接口来支持，在java.io包下主要不包括输入、输出两种IO流，每种输入、输出流又可分为字节流和字符流两大类。除此之外，Java的IO流使用了一种装饰器设计模式，它将IO流分成底层节点流和上层处理流，其中节点流用于和底层的物理存储节点直接关联——不同的物理节点流获取节点流的方式可能存在一定的差异，但程序可以把不同的物理节点流包装成统一的处理流，从而允许程序">
+  
+    <link rel="alternate" href="/atom.xml" title="Becky" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Becky</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/becky76/becky76.github.io/blob/master/index.html"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Java的I-O流" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/13/Java的I-O流/" class="article-date">
+  <time datetime="2017-06-13T06:50:18.000Z" itemprop="datePublished">2017-06-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java的I/O流
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Java的IO通过java.io包下的类和接口来支持，在java.io包下主要不包括输入、输出两种IO流，每种输入、输出流又可分为字节流和字符流两大类。除此之外，Java的IO流使用了一种装饰器设计模式，它将IO流分成底层节点流和上层处理流，其中节点流用于和底层的物理存储节点直接关联——不同的物理节点流获取节点流的方式可能存在一定的差异，但程序可以把不同的物理节点流包装成统一的处理流，从而允许程序使用统一的输入、输出代码来读取不同的物理存储节点的资源。</p>
+<h2 id="File类"><a href="#File类" class="headerlink" title="File类"></a>File类</h2><p>File类是java.io包下代表与平台无关的文件和目录。不管是文件还是目录都是使用File来操作的，<strong>File能新建、删除、重命名文件和目录，但不能访问文件内容本身。如果需要访问文件内容本身，则需要使用输入/输出流</strong>。</p>
+<ol>
+<li>###访问文件名相关的方法<br> <strong>String getName():返回此File对象的文件名。</strong><br> <strong>String getPath():返回此File对象所对应的路径名。</strong><br> String getAbsolutePath():返回此File对象所对应的绝对路径名。<br> boolean renameTo(File newName):重命名此File对象所对应的文件或目录。成功后返回true。<br> 文件检测相关的方法<br> <strong>boolean exists()</strong><br> boolean canWrite/canRead()<br> <strong>boolean isFile()</strong><br> <strong>boolean isDirectory()</strong><br> 获取常规文件信息<br> long lastModeified()<br> long length():返回文件内容的长度。<br> 文件操作相关的方法<br> <strong>boolean createNewFile():当此File对象所对应的文件不存在时，该方法将新建一个该File对象所所指定的新文件。创建成功则返回true。</strong><br> boolean delete()<br> 目录操作相关的方法<br> <strong>boolean mkdir():创建一个File对象所对应的目录，如果创建成功返回true。调用该方法时File对象必须对应一个路径，而不是文件。</strong><br> String[] list():列出File对象的所有子文件名和路径名，返回String数组。<br> File[] listFiles():列出File对象的所有子文件和路径，返回File数组。<br>tip:Java中的反斜线表示转义字符，在Windows的路径下应使用两条反斜线。如：D:\Java\test.txt。</li>
+</ol>
+<h2 id="理解Java的I-O流"><a href="#理解Java的I-O流" class="headerlink" title="理解Java的I/O流"></a>理解Java的I/O流</h2><p>标准输入输出，文件的操作，网络上的数据流，字符串流，对象流，zip文件流等等，java中将输入输出抽象称为流，就好像水管，将两个容器连接起来。将数据冲外存中读取到内存中的称为输入流，将数据从内存写入外存中的称为输出流。 流是一个很形象的概念，当程序需要读取数据的时候，就会开启一个通向数据源的流，这个数据源可以是文件，内存，或是网络连接。类似的，当程序需要写入数据的时候，就会开启一个通向目的地的流。<br>详情：<a href="http://blog.csdn.net/hguisu/article/details/7418161" target="_blank" rel="external">http://blog.csdn.net/hguisu/article/details/7418161</a></p>
+<h2 id="字节流和字符流"><a href="#字节流和字符流" class="headerlink" title="字节流和字符流"></a>字节流和字符流</h2><p><strong>字节流主要由InputStream和OutputStream作为基类，字符流主要由Reader和Writer作为基类。他们都是一些抽象基类，无法直接创建实例。Java的IO流的四十多个类都是由这四个抽象基类派生的。</strong><br>  <strong>InputStream</strong><br>  int read():从输入流中读取单个字节，返回所读取的字节数据。<br>  int read(byte[] b):从输入流中最多读取b.length该字节的数据，并将其存储在字节数组b中，返回实际读取的字节数。<br>  int read(byte[] b,int off,int len):从输入流中最多读取b.length该字节的数据，并将其存储在字节数组b中，但不是从数组b的起点开始，而是从off位置开始，返回实际读取的字节数。<br>  <strong>Reader</strong><br>  int read()<br>  int read(char[] cbuf)<br>  int read(char[] cbuf,int off,int len)<br>  直到read(byte[] b)或read（char[] cbuf)方法返回-1，表明到了输入流的结束点。<br>  InputStream和Reader不能创建实例，但它们分别有一个用于读取文件的输入流FileInputStream和FileReader。<br>  ‘’’<br>  public class FileInputStreamTest{<br>    public static void main(String[] args) throws IOException{<br>        FileInputStream fis = new FileInputStream(“FileInputStreamTest.java”); //创建字节输入流<br>        byte[] bbuf = new byte[1024];<br>        int hasRead = 0; //用于保存实际读取的字节数<br>        while((hasRead = fis.read(bbuf) &gt; 0 ){<br>            System.out.print(new String(bbuf , 0 , hasRead));    //将字节数组转换成字符串输入<br>        }<br>        fis.close();    //关闭文件输入流<br>    }<br>  }<br>  ‘’’<br>  tip:程序里打开的文件IO资源不属于内存里的资源，垃圾回收机制无法回收该资源，所以应该显式关闭文件IO资源。<br>  <strong>OutputStream和Writer</strong><br>  int write(int c):将指定的字节/字符输出到输出流。c可以是字节也可以是字符。<br>  int write(byte[]/char[] buf):将指定的字节/字符输出到指定输出流中。<br>  int write(byte[]/char[] buf,int off,int len):将字节数组/字符数组中从off位置开始，长度为len的字节/字符输出到输出流中。<br>  Writer里还包含以下两个方法：void write(String str)和void write(Stirng str,int off,int len)<br>  ‘’’<br>  public class FileOutputStreamTest{<br>    public static void main(String[] args) throws IOException{<br>        try(    //Java7改写了所有的IO资源类，它们都实现了AutoCloseable接口，因此都可通过自动关闭资源的try语句来关闭这些IO流。<br>            FileInputStream fis = new FileInputStream(“FileOutputStreamTest.java”); //创建字节输入流<br>            FileOutputStream fos = new FileOutputStream(“newFile.txt”); //创建字节输出流<br>        )<br>        {<br>            byte[] bbuf = new byte[32];<br>            int hasRead = 0; //用于保存实际读取的字节数<br>            while((hasRead = fis.read(bbuf) &gt; 0 ){<br>                fos.write(bbuf,0,hasRead);    //每读取一次就写入文件输出流<br>            }<br>        }<br>        catch(IOException ioe)<br>        {<br>            ioe.printStackTrace();<br>        }<br>    }<br>  }<br>  ‘’’</p>
+<h2 id="输入-输出流体系"><a href="#输入-输出流体系" class="headerlink" title="输入/输出流体系"></a>输入/输出流体系</h2><ol>
+<li><h3 id="处理流"><a href="#处理流" class="headerlink" title="处理流"></a>处理流</h3><p>上一节介绍了4个<strong>访问文件的节点流</strong>的用法，接下来介绍处理流。<br>使用处理流时的思路是，使用处理流来包装节点流，程序通过处理流来执行输入/输出功能，让节点流与底层的I/O设备、文件交互。<br>下面使用PrintStream处理流来包装OutputStream，使用处理流后的输出流在输出时更加方便。<br> ‘’’<br> public class PrintStreamTest<br> {</p>
+<pre><code>public static void main(Stirng[] args)
+{
+    try(
+        FileOutputStream fos = new FileOutputStream(&quot;test.txt&quot;);
+        PrintStream ps = new PrintStream(fos);)
+    {
+        ps.println(&quot;aaabbbb&quot;);
+        ps.println(new PrintStreamTest());
+    }
+    catch(IOException ioe)
+    {
+        ioe.printStackTrace();
+    }
+}
+</code></pre><p> }<br> ‘’’<br> <strong>System.out的类型就是PrintStream</strong></p>
+</li>
+<li><h3 id="转换流"><a href="#转换流" class="headerlink" title="转换流"></a>转换流</h3><p><strong>InputStreamReader将字节输入流转换成字符输入流，OutputStreamWriter将字节输出流转换成字符输出流。</strong></p>
+</li>
+</ol>
+<h2 id="重定向标准输入-输出"><a href="#重定向标准输入-输出" class="headerlink" title="重定向标准输入/输出"></a>重定向标准输入/输出</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/13/Java的I-O流/" data-id="cjab5eecj000a8o400gnh6tff" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/06/15/Java多线程/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Java多线程
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">由ListNode引发的类中定义自身类的对象……</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/11/22/Java垃圾回收机制/">Java垃圾回收机制</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/30/单例模式/">单例模式</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/15/Java多线程/">Java多线程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/13/Java的I-O流/">Java的I/O流</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/">由ListNode引发的类中定义自身类的对象……</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

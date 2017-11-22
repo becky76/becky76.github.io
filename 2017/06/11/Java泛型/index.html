@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java泛型 | Becky</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="泛型在没有泛型之前，一旦把一个对象“丢进”Java集合中，集合就会忘记对象的类型，把所有的对象当成Object类型处理（如果想创建一个只能保存String类型的集合，但程序可以将int类型丢进）。当程序从集合中取出对象后，就需要进行强制类型转换，可能引发ClassCastException异常（将对象强制转化成String类型，此时编译阶段正常,但运行时int类型的对象将引发异常）。示例如下：‘’">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java泛型">
+<meta property="og:url" content="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/11/Java泛型/index.html">
+<meta property="og:site_name" content="Becky">
+<meta property="og:description" content="泛型在没有泛型之前，一旦把一个对象“丢进”Java集合中，集合就会忘记对象的类型，把所有的对象当成Object类型处理（如果想创建一个只能保存String类型的集合，但程序可以将int类型丢进）。当程序从集合中取出对象后，就需要进行强制类型转换，可能引发ClassCastException异常（将对象强制转化成String类型，此时编译阶段正常,但运行时int类型的对象将引发异常）。示例如下：‘’">
+<meta property="og:updated_time" content="2017-06-11T08:24:57.423Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java泛型">
+<meta name="twitter:description" content="泛型在没有泛型之前，一旦把一个对象“丢进”Java集合中，集合就会忘记对象的类型，把所有的对象当成Object类型处理（如果想创建一个只能保存String类型的集合，但程序可以将int类型丢进）。当程序从集合中取出对象后，就需要进行强制类型转换，可能引发ClassCastException异常（将对象强制转化成String类型，此时编译阶段正常,但运行时int类型的对象将引发异常）。示例如下：‘’">
+  
+    <link rel="alternate" href="/atom.xml" title="Becky" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Becky</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/becky76/becky76.github.io/blob/master/index.html"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Java泛型" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/11/Java泛型/" class="article-date">
+  <time datetime="2017-06-11T01:22:51.000Z" itemprop="datePublished">2017-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java泛型
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h2><p>在没有泛型之前，一旦把一个对象“丢进”Java集合中，集合就会忘记对象的类型，把所有的对象当成Object类型处理（如果想创建一个只能保存String类型的集合，但程序可以将int类型丢进）。当程序从集合中取出对象后，就需要进行强制类型转换，可能引发ClassCastException异常（将对象强制转化成String类型，此时编译阶段正常,但运行时int类型的对象将引发异常）。示例如下：<br>‘’’<br>public class GenericTest {<br>    public static void main(String[] args) {<br>        List list = new ArrayList();<br>        list.add(“chocolate”);<br>        list.add(“ice cream”);<br>        list.add(10);</p>
+<pre><code>    for (int i = 0; i &lt; list.size(); i++) {
+        String snacks = (String) list.get(i); 
+        System.out.println(&quot;snacks:&quot; + name);
+    }
+}
+</code></pre><p>}<br>‘’’<br>从Java5以后，Java引入了“参数化类型”，运行我们在创建集合时指定集合元素的类型，如List<string>，这表明该List只能保存字符串类型的对象。Java的参数化类型被称为泛型（Generic）。<br><strong>所谓泛型，就是允许在定义类、接口、方法时使用类型形参，这个类型形参将在声明变量、创建对象、调用方法时动态地指定（即传入实际的类型参数，即类型实参）</strong>。<br>在List<string>中，String是类型实参，那么相应的List接口中肯定含有类型形参。<br>public interface List<e><br>{<br>    //下面方法可以使用E作为参数类型,类型形参在整个类体内可当成类型使用。<br>    void add(E x);<br>    Iterator<e> iterator();<br>}<br>例如我们使用List类型时，为E形参传入了String类型实参，则产生了List<string>类型，我们可以把它想象成E全部替换成String的特殊List子接口。因此，虽然程序只定义了一个List<e>接口，但实际使用时可以产生无数多个List接口。</e></string></e></e></string></string></p>
+<h3 id="自定义泛型接口、泛型类和泛型方法"><a href="#自定义泛型接口、泛型类和泛型方法" class="headerlink" title="自定义泛型接口、泛型类和泛型方法"></a>自定义泛型接口、泛型类和泛型方法</h3><p>‘’’<br>public class Apple<t> //定义Apple类时使用了泛型声明<br>{<br>    private T info;  //使用T类型形参定义实例变量<br>    //下面方法中使用T类型形成残来定义构造器<br>    public Apple(){}<br>    public Apple(T info)<br>    {<br>        this.info = info;<br>    }<br>    public T getInfo()<br>    {<br>        return this.info;<br>    }<br>    public static void main(String[] args)<br>    {<br>        Apple<string> a1 = new Apple&lt;&gt;(“苹果”);<br>        System.out.println(a1.getInfo());<br>    }<br>}<br>‘’’<br>创建带泛型声明的自定义类，为该类定义构造器时，构造器名还是原来的类名，不要增加泛型声明。如为Apple<t>类定义构造器，其构造器类名仍然是Apple，而不是Apple<t>。调用该构造器时，可以使用Apple<t>（需传入类型实参），也可以省略&lt;&gt;中的类型实参。<br>虽然可以传入不容的类型实参，从而动态地生成无数多个逻辑上的子类，但这种子类逻辑上不存在。Apple<string>和Apple<integer>是同一个类，内存中也只占用一块内存空间。</integer></string></t></t></t></string></t></p>
+<h3 id="从泛型类派生子类"><a href="#从泛型类派生子类" class="headerlink" title="从泛型类派生子类"></a>从泛型类派生子类</h3><p>当使用带泛型声明的接口、父类时不能再包含类型形参。如<br>‘’’<br>public class A extends Apple<t>{}<br>‘’’<br>这是错的。<br>‘’’<br>public class A extends Apple<string>{}<br>‘’’<br>是正确的。但也可以不为类型形参传输实际的类型参数。即下面代码也是正确的<br>‘’’<br>public class A extends Apple<br>‘’’<br>但是Java编译器可能发出警告：使用了未经检查或不安全的操作。</string></t></p>
+<h3 id="类型通配符"><a href="#类型通配符" class="headerlink" title="类型通配符"></a>类型通配符</h3><p>‘’’<br>public void test(List<object> c)<br>{<br>    for(int i = 0; i &lt; c.size(); i++)<br>    {<br>        System.out.println(c.get(i));<br>    }<br>}<br>‘’’<br>这个方法声明没有问题，但调用该方法时，编译错误<br>‘’’<br>List<string> strList = new ArrayList&lt;&gt;();<br>test(strList);<br>‘’’<br>原因是<strong>泛型和数组有所不同，假设Foo是Bar的一个子类型（子类或子接口），那么Foo[]依然是Bar[]的子类型，但G<foo>不是G<bar>的子类型</bar></foo></strong>。<br>所以引入了类型通配符来表示各种泛型List的父类。<br>我们可以将上面方法改写为如下形式：<br>‘’’<br>public void test(List&lt;?&gt; c)<br>{<br>    for(int i = 0; i &lt; c.size(); i++)<br>    {<br>        System.out.println(c.get(i));<br>    }<br>}<br>‘’’<br>类型通配符上限通过List&lt;? extends xxx&gt;形式定义。它表示所有xxx泛型List的父类。</string></object></p>
+<p>###泛型方法</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/11/Java泛型/" data-id="cjab5eebp00078o40euxg0pss" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/06/11/Java异常处理/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Java异常处理
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/10/Java集合/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Java集合</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/11/22/Java垃圾回收机制/">Java垃圾回收机制</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/30/单例模式/">单例模式</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/15/Java多线程/">Java多线程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/13/Java的I-O流/">Java的I/O流</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/">由ListNode引发的类中定义自身类的对象……</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

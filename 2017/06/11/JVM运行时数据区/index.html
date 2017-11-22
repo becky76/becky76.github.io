@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java�쳣���� | Becky</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="JVM���ڴ����򻮷�����ʱ��������JavaԴ���루.java����Java����������Ϊ�ֽ����ļ���.class����Ȼ����JVM�е������������ظ��������ֽ����ļ�����������֮�󣬽���JVMִ������ִ�С�����������ִ�й����У�JVM����һ�οռ����洢����ִ���ڼ���Ҫ�õ�">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java�쳣����">
+<meta property="og:url" content="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/11/JVM运行时数据区/index.html">
+<meta property="og:site_name" content="Becky">
+<meta property="og:description" content="JVM���ڴ����򻮷�����ʱ��������JavaԴ���루.java����Java����������Ϊ�ֽ����ļ���.class����Ȼ����JVM�е������������ظ��������ֽ����ļ�����������֮�󣬽���JVMִ������ִ�С�����������ִ�й����У�JVM����һ�οռ����洢����ִ���ڼ���Ҫ�õ�">
+<meta property="og:updated_time" content="2017-11-22T13:58:33.806Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java�쳣����">
+<meta name="twitter:description" content="JVM���ڴ����򻮷�����ʱ��������JavaԴ���루.java����Java����������Ϊ�ֽ����ļ���.class����Ȼ����JVM�е������������ظ��������ֽ����ļ�����������֮�󣬽���JVMִ������ִ�С�����������ִ�й����У�JVM����һ�οռ����洢����ִ���ڼ���Ҫ�õ�">
+  
+    <link rel="alternate" href="/atom.xml" title="Becky" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Becky</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/becky76/becky76.github.io/blob/master/index.html"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-JVM运行时数据区" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/11/JVM运行时数据区/" class="article-date">
+  <time datetime="2017-06-11T08:26:53.000Z" itemprop="datePublished">2017-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java�쳣����
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="JVM���ڴ����򻮷�"><a href="#JVM���ڴ����򻮷�" class="headerlink" title="JVM���ڴ����򻮷�"></a>JVM���ڴ����򻮷�</h3><p>����ʱ��������JavaԴ���루.java����Java����������Ϊ�ֽ����ļ���.class����Ȼ����JVM�е������������ظ��������ֽ����ļ�����������֮�󣬽���JVMִ������ִ�С�����������ִ�й����У�JVM����һ�οռ����洢����ִ���ڼ���Ҫ�õ������ݺ�������Ϣ�����οռ�һ�㱻��ΪRuntime Data Area(����ʱ������),Ҳ�������ǳ�˵��JVM�ڴ档</p>
+<h3 id="����ʱ�����������l�����"><a href="#����ʱ�����������l�����" class="headerlink" title="����ʱ�����������ļ�����"></a>����ʱ�����������ļ�����</h3><p>���ݡ�Java�������淶���Ĺ涨������ʱ������ͨ�������⼸�����֣�����������(Program Counter Register)��Javaջ(VM Stack)�����ط���ջ(Native Method Stack)��������(Method Area)����(Heap)��</p>
+<h3 id="����ʱ��������y���ֵ��״洢����Щ���ݣ�"><a href="#����ʱ��������y���ֵ��״洢����Щ���ݣ�" class="headerlink" title="����ʱ��������ÿ���ֵ��״洢����Щ���ݣ�"></a>����ʱ��������ÿ���ֵ��״洢����Щ���ݣ�</h3><h3 id="Javaջ"><a href="#Javaջ" class="headerlink" title="Javaջ"></a>Javaջ</h3><p>����JavaջҲ����������ջ��Java Vitual Machine Stack����Ҳ�������ǳ�����˵��ջ����C���Ե����ݶ��е�ջ���ơ�<br>Javaջ�д��ŵ���һ������ջ֡��ÿ��ջ֡��Ӧһ�������õķ�������ջ֡�а����ֲ�������(Local Variables)��������ջ(Operand Stack)��ָ����ǰ������������������ʱ�����أ�����ʱ�����صĸ����ڷ��������ֻ�̸����������(Reference to runtime constant pool)���������ص�ַ(Return Address)��һЩ�����ĸ�����Ϣ�����߳�ִ��һ������ʱ���ͻ���֮����һ����Ӧ��ջ֡������������ջ֡ѹջ��������ִ������֮�󣬱��Ὣջ֡��ջ�����˿�֪���̵߳�ǰִ�еķ�������Ӧ��ջ֡�ض�λ��Javaջ�Ķ���������������Ҿ�Ӧ�û�����Ϊʲô �� ʹ�� �ݹ鷽����ʱ�����׵���ջ�ڴ��������������Լ�Ϊʲôջ���Ŀռ䲻�ó���Աȥ�����ˣ���Ȼ��Java�У�����Ա�������ù�ϵ���ڴ��������ͷŵ����飬��ΪJava���Լ����������ջ��ƣ����ⲿ�ֿռ��ķ������ͷŶ�����ϵͳ�Զ�ʵʩ�ġ��������еĳ�������������˵��ջ�ⲿ�ֿռ��Գ���Ա��˵�ǲ�͸���ġ�<br>��<strong>�ֲ�������</strong>������˼�壬���������洢�����еľֲ������������ڷ����������ķǾ�̬�����Լ������βΣ������ڻ����������͵ı�������ֱ�Ӵ洢����ֵ�������������͵ı�������������ָ�����������á��ֲ��������Ĵ�С�ڱ������Ϳ���ȷ������С�ˣ������ڳ���ִ���ڼ��ֲ��������Ĵ�С�ǲ����ı��ġ�<br>����<strong>������ջ</strong>������ѧ�����ݽṹ�е�ջ���������ضԱ���ʽ��ֵ���ⲻ��İ����ջ�����͵�һ��Ӧ�þ��������Ա���ʽ��ֵ������һ���߳�ִ�з����Ĺ����У�ʵ���Ͼ��ǲ���ִ�������Ĺ��̣����������׾��ǽ��м����Ĺ��̡����˿�����ô˵�������е����м������̶����ڽ����ڲ�����ջ�����ɵġ�<br>����<strong>ָ������ʱ�����ص�����</strong>����Ϊ�ڷ���ִ�еĹ������п�����Ҫ�õ����еĳ��������Ա���Ҫ��һ������ָ������ʱ������<br>����<strong>�������ص�ַ</strong>����һ������ִ������֮����Ҫ����֮ǰ�������ĵط���������ջ֡�б��뱣��һ���������ص�ַ��<br>��������ÿ���߳�����ִ�еķ������ܲ�ͬ������ÿ���̶߳�����һ���Լ���Javaջ���������š�</p>
+<h3 id="��"><a href="#��" class="headerlink" title="��"></a>��</h3><p>����Java�еĶ��������洢<strong>�����������Լ�����</strong>����Ȼ�����������Ǵ�����Javaջ�еģ���ֻ������C�����еĲ�ͬ����Java�У�����Ա��������ȥ���Ŀռ��ͷŵ����⣬Java���������ջ��ƻ��Զ����д����������ⲿ�ֿռ�Ҳ��Java�����ռ�����������Ҫ���������⣬���Ǳ������̹߳����ģ���JVM��ֻ��һ���ѡ�</p>
+<p>###������<br>��������������һ�����Ǳ��̹߳������������ڷ������У��洢��<strong>ÿ��������Ϣ�������������ơ�������Ϣ���ֶ���Ϣ������̬�����������Լ��������������Ĵ���</strong>�ȡ�<br>������Class�ļ��г��������ֶΡ��������ӿڵ�������Ϣ�⣬����һ����Ϣ�ǳ����أ������洢�����ڼ����ɵ��������ͷ������á�<br>�����ڷ���������һ���ǳ���Ҫ�Ĳ��־�������ʱ<strong>������</strong>������ÿһ�������ӿڵĳ����ص�����ʱ��ʾ��ʽ�������ͽӿڱ����ص�JVM�󣬶�Ӧ������ʱ�����ؾͱ�������������Ȼ����Class�ļ��������е����ݲ��ܽ�������ʱ�����أ��������ڼ�Ҳ�ɽ��µĳ�����������ʱ�������У�����String��intern������</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/becky76/becky76.github.io/blob/master/index.html/2017/06/11/JVM运行时数据区/" data-id="cjab4ighd0001o040kx7a29wv" class="article-share-link">Partager</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/06/11/JVM-运行时数据区/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Récent</strong>
+      <div class="article-nav-title">
+        
+          Java异常处理
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/11/Java异常处理/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ancien</strong>
+      <div class="article-nav-title">Java异常处理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Articles récents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/08/30/单例模式/">单例模式</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/15/Java多线程/">Java多线程</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/13/Java的I-O流/">Java的I/O流</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/12/由ListNode引发的类中定义自身类的对象……/">由ListNode引发的类中定义自身类的对象……</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/11/JVM-运行时数据区/">Java异常处理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
